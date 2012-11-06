@@ -390,7 +390,7 @@ def plot_domains_stability(gs,mr):
       gs = gridspec.GridSpecFromSubplotSpec(2, len(mr.records.keys()), subplot_spec=gs)  
       for i,s in enumerate(mr.records.keys()):
           ax = pylab.subplot(gs[0,i])
-          ax.imshow(mr.records[s]['activity'][5],cmap='gray') 
+          ax.imshow(mr.records[s]['activity'][20],cmap='gray') 
           ax = pylab.subplot(gs[1,i])
           ax.imshow(sum(mr.records[s]['activity']),cmap='gray') 
 
@@ -416,7 +416,7 @@ def domains_stability_test(parameters,parameter_values,sheets,sheets_to_record,r
     from modelparametrization import ModelRecording,ModelParametrization
     mr = ModelRecording(sheets, retina, sheets_to_record = sheets_to_record, reset_homeo = reset_homeo)
     #return mr
-    f = lambda : mr.present_stimulus_sequence(1.0,[None,None,None,None,None,None,None])
+    f = lambda : mr.present_stimulus_sequence(1.0,[None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None])
     mp = ModelParametrization(parameters,parameter_values,f,plot_domains_stability,{'mr' : mr},directory)
     mp.go(initial_run=True)
 

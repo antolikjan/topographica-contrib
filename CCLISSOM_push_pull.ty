@@ -42,7 +42,7 @@ ring = topo.pattern.Composite(operator=numpy.add,x=numbergen.UniformRandom(lboun
                                 		topo.pattern.random.UniformRandom(offset=0, scale=0.01)]
                                    )
 
-retinal_waves=Expander(generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=15,speed=0.3)
+retinal_waves=Expander(generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=__main__.__dict__.get('reset_period',15),speed=__main__.__dict__.get('speed',0.3))
 zeroInput = topo.pattern.Null();
 
 
@@ -70,8 +70,8 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 
 # Set up transfer function and homeostatic mechanisms
-V1Simple_OF = SimpleHomeoLinear(t_init=__main__.__dict__.get('t_init_exc',0.35),alpha=3,mu=__main__.__dict__.get('MUE',0.003),eta=__main__.__dict__.get('SETAE',0.002))
-V1Simple_OFInh = SimpleHomeoLinear(t_init=__main__.__dict__.get('t_init_inh',0.35),alpha=3,mu=__main__.__dict__.get('MUI',0.003),eta=__main__.__dict__.get('SETAI',0.002))
+V1Simple_OF = SimpleHomeoLinear(t_init=__main__.__dict__.get('t_init_exc',0.35),alpha=__main__.__dict__.get('alpha_init_inh',3.0),mu=__main__.__dict__.get('MUE',0.003),eta=__main__.__dict__.get('SETAE',0.002))
+V1Simple_OFInh = SimpleHomeoLinear(t_init=__main__.__dict__.get('t_init_inh',0.35),alpha=__main__.__dict__.get('alpha_init_inh',3.0),mu=__main__.__dict__.get('MUI',0.003),eta=__main__.__dict__.get('SETAI',0.002))
 V1Complex_OF=HalfRectify()
 NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=0.02,offset=0.0),operator=numpy.add)
 
@@ -290,15 +290,19 @@ parameters = [ "topo.sim[\"V1Simple\"].projections()[\"V1SimpleExcToExc\"].stren
                "topo.sim[\"V1SimpleInh\"].projections()[\"V1SimpleInhToInh\"].strength",
                "topo.sim[\"V1SimpleInh\"].projections()[\"V1SimpleInhFeedback\"].strength",
                "topo.sim[\"V1Complex\"].projections()[\"V1SimpleAfferent\"].strength",
+               "topo.sim[\"V1Simple\"].output_fns[2].alpha",
+               "topo.sim[\"V1SimpleInh\"].output_fns[2].alpha",
              ]   
              
 parameter_values = [ [1.0],
-                     [-5.7,-6.0,-6.3,-6.6,-6.9],
-                     [0.18,0.21,0.22,0.23,0.24,0.25,0.26], 
-                     [0.4],
                      [-5.7],
-                     [0.18],
-                     [4.0],
+                     [0.21], 
+                     [0.4,0.5,0.6,0.7],
+                     [-5.7],
+                     [0.24], 
+                     [4.0,4.5,5.0],
+                     [3.0,4.0,5.0],
+                     [5.0,6.0,7.0,8.0]
                    ]
                    
 #parameter_values = [ [1.0],
@@ -309,9 +313,10 @@ parameter_values = [ [1.0],
 #                     [0.2],
 #                     [4.0],
 #                   ]
-                   
+
+#topo.sim.run(120.0)                   
 #z = domains_stability_test(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex"],None,"FakeRetina",0,'Activities')
-#topo.sim.run(1.0)
+#topo.sim.run(120.0)
 #z.pre_test()
 
 #contrib.modelparametrization.explore_initial_activity(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex","V1Complex"],None,"FakeRetina",0,4.0,'Activities')
