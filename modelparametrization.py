@@ -5,7 +5,6 @@ import pylab
 
 class ModelRecording(object):
       """
-      
       sheets            - list of sheets of the model that need to be reset 
       retina            - retina name of the model
       reset_homeo       - HACKY
