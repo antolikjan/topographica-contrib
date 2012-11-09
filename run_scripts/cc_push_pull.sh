@@ -1,13 +1,17 @@
-$ -S /bin/bash
-#$ -cwd 
-
+#!/bin/bash
+#$ -cwd -V
+#$ -l h_rt=43:59:00
+#$ -q ecdf
+#$ -R y
+#$ -pe OpenMP 4
+#$ -N cc_lissom_pp
+echo 'starting'
 argsprefix="analysis_scale=0.3,"
 
 let "a=RANDOM/1600"
 sleep $a
 
 arguments=(
-
 "A=0,ImageScale=0.35,AFF_lr=0.4,StoCStr=5.0,MUE=0.03,MUI=0.03,SETAE=0.004,SETAI=0.002,default_density=96,LGNStr=4.5,SEEStr=1.0,SEIStr=0.5,SIEStr=-5.7,SIIStr=-5.7,CEFeedback=0.21,CIFeedback=0.24,SEElr=0.0,SEIlr=0.0,SIElr=0.0,SIIlr=0.0,CCStrInh=2.5,CCStrExc=2.0,StoCSize=0.15,Inbalance=0.3,speed=0.1,reset_period=40,t_init_exc=0.35,t_init_inh=0.4,alpha_init_exc=5.0,alpha_init_inh=7.0"
 "A=1,ImageScale=0.35,AFF_lr=0.1,StoCStr=5.0,MUE=0.03,MUI=0.03,SETAE=0.004,SETAI=0.002,default_density=96,LGNStr=4.5,SEEStr=1.0,SEIStr=0.5,SIEStr=-5.7,SIIStr=-5.7,CEFeedback=0.21,CIFeedback=0.24,SEElr=0.0,SEIlr=0.0,SIElr=0.0,SIIlr=0.0,CCStrInh=2.5,CCStrExc=2.0,StoCSize=0.15,Inbalance=0.3,speed=0.1,reset_period=40,t_init_exc=0.35,t_init_inh=0.4,alpha_init_exc=5.0,alpha_init_inh=7.0"
 "A=2,ImageScale=0.35,AFF_lr=0.3,StoCStr=5.0,MUE=0.03,MUI=0.03,SETAE=0.004,SETAI=0.002,default_density=96,LGNStr=4.5,SEEStr=1.0,SEIStr=0.5,SIEStr=-5.7,SIIStr=-5.7,CEFeedback=0.21,CIFeedback=0.24,SEElr=0.0,SEIlr=0.0,SIElr=0.0,SIIlr=0.0,CCStrInh=2.5,CCStrExc=2.0,StoCSize=0.15,Inbalance=0.3,speed=0.1,reset_period=40,t_init_exc=0.35,t_init_inh=0.4,alpha_init_exc=5.0,alpha_init_inh=7.0"
@@ -47,8 +51,8 @@ arguments=(
 "A=37,ImageScale=0.35,AFF_lr=0.4,StoCStr=5.0,MUE=0.03,MUI=0.03,SETAE=0.004,SETAI=0.002,default_density=96,LGNStr=4.5,SEEStr=1.0,SEIStr=0.5,SIEStr=-5.7,SIIStr=-5.7,CEFeedback=0.21,CIFeedback=0.24,SEElr=0.0,SEIlr=0.0,SIElr=0.0,SIIlr=0.0,CCStrInh=2.5,CCStrExc=2.0,StoCSize=0.15,Inbalance=0.3,speed=0.1,reset_period=40,t_init_exc=0.35,t_init_inh=0.4,alpha_init_exc=6.0,alpha_init_inh=6.0"
 ) 
 
+args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/CCLISSOM_push_pull.ty",analysis_fn=contrib.jaanalysis.complex_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/CCLISSOMPP29/",times=[5006,5007,10004,10005],snapshot=False,dirname_prefix='
 
-args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/JanA/CCLISSOM_push_pull.ty",analysis_fn=contrib.jaanalysis.complex_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/CCLISSOMPP30/",times=[5006,5007,10004,10005],snapshot=False,dirname_prefix='
 a="$args 'A$1', $argsprefix ${arguments[$1]}  )"
 echo "${a}"
 /exports/home/s0570140/go_new/topographica/topographica -c openmp=True  -c openmp_threads=4 -c "${a}"
