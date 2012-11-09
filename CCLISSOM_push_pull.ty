@@ -315,7 +315,7 @@ parameter_values = [ [1.0],
 #                   ]
 
 #topo.sim.run(120.0)                   
-z = domains_stability_test(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex"],None,"FakeRetina",0,'Activities')
+#z = domains_stability_test(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex"],None,"FakeRetina",0,'Activities')
 #topo.sim.run(120.0)
 #z.pre_test()
 
