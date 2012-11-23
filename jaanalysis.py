@@ -167,6 +167,67 @@ def complex_analysis_function():
     topo.sim["V1Complex"].in_connections[0].strength = a
     #topo.sim["V1Complex"].in_connections[0].strength=st
 
+def push_pull_analysis_function():
+    print 'Push pull complex_analysis_function'
+    import topo
+    import numpy
+    from topo.command.analysis import save_plotgroup
+    from topo.base.projection import ProjectionSheet
+    from topo.sheet import GeneratorSheet
+    from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
+    import contrib.jacommands
+    from contrib.CCLISSOM_push_pull_extra import analyse_push_pull_connectivity
+    exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
+    
+    print 'Analysing'
+    
+    import matplotlib
+    matplotlib.rc('xtick', labelsize=17)
+    matplotlib.rc('ytick', labelsize=17)					
+			
+    print 'Build a list of all sheets worth measuring'
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
+    input_sheets = topo.sim.objects(GeneratorSheet).values()
+							    
+    print 'Set potentially reasonable defaults; not necessarily useful'
+    topo.command.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
+    
+    FeatureCurveCommand.curve_parameters=[{"contrast":30},{"contrast":50},{"contrast":70},{"contrast":90}]
+    
+    save_plotgroup("Orientation Preference and Complexity")
+    save_plotgroup("Activity")
+
+									
+    # Plot all projections for all measured_sheets
+    for s in measured_sheets:
+        for p in s.projections().values():
+            save_plotgroup("Projection",projection=p)
+
+    analyse_push_pull_connectivity()
+    
+    if(float(topo.sim.time()) >= 10005.0): 
+        print 'Measuring orientations'
+        SinusoidalMeasureResponseCommand.frequencies=[2.4]
+        topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1Complex"])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1Complex"],coords=[(0,0)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0.1]",sheet=topo.sim["V1Complex"],coords=[(0.1,0.1)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,-0.1]",sheet=topo.sim["V1Complex"],coords=[(0.1,-0.1)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,0.1]",sheet=topo.sim["V1Complex"],coords=[(-0.1,0.1)])()    
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,-0.1]",sheet=topo.sim["V1Complex"],coords=[(-0.1,-0.1)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.2,0.2]",sheet=topo.sim["V1Complex"],coords=[(0.2,0.2)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.2,-0.2]",sheet=topo.sim["V1Complex"],coords=[(0.2,-0.2)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.2,0.2]",sheet=topo.sim["V1Complex"],coords=[(-0.2,0.2)])()    
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.2,-0.2]",sheet=topo.sim["V1Complex"],coords=[(-0.2,-0.2)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0.1]",sheet=topo.sim["V1Complex"],coords=[(0.0,0.1)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.1]",sheet=topo.sim["V1Complex"],coords=[(0.0,-0.1)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,0]",sheet=topo.sim["V1Complex"],coords=[(-0.1,0.0)])()    
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0]",sheet=topo.sim["V1Complex"],coords=[(0.1,-0.0)])()
+
+        
+
 def complex_surround_analysis_function():
 
     """
