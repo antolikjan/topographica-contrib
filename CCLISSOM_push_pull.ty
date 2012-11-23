@@ -295,11 +295,11 @@ parameters = [ "topo.sim[\"V1Simple\"].projections()[\"V1SimpleExcToExc\"].stren
              ]   
              
 parameter_values = [ [1.0],
+                     [-5.7,-6.2,-6.7],
+                     [0.21,0.23,0.25], 
+                     [0.5,0.6,0.7],
                      [-5.7],
-                     [0.21], 
-                     [0.5],
-                     [-5.7],
-                     [0.24], 
+                     [0.24,0.26,0.28], 
                      [4.5],
                      [5.0],
                      [7.0]
@@ -314,7 +314,7 @@ parameter_values = [ [1.0],
 #                     [4.0],
 #                   ]
 
-#topo.sim.run(120.0)                   
+#topo.sim.run(480.0)                   
 #z = domains_stability_test(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex"],None,"FakeRetina",0,'Activities')
 #topo.sim.run(120.0)
 #z.pre_test()
