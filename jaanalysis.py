@@ -177,6 +177,7 @@ def push_pull_analysis_function():
     from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
     import contrib.jacommands
     from contrib.CCLISSOM_push_pull_extra import analyse_push_pull_connectivity
+    from param import normalize_path
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
     
     print 'Analysing'
@@ -205,7 +206,7 @@ def push_pull_analysis_function():
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
-
+    print normalize_path('a')
     analyse_push_pull_connectivity()
     
     if(float(topo.sim.time()) >= 10005.0): 
