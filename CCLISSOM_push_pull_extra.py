@@ -381,7 +381,7 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
     pylab.bar(numpy.arange(2), (numpy.mean(av1),numpy.mean(av2)),   0.35, color='b')
     
     from param import normalize_path
-    pylab.savefig(normalize_path('PPconnectivity: ' + sheet_name + '|' + proj_name + topo.sim.time));
+    pylab.savefig(normalize_path('PPconnectivity: ' + sheet_name + '|' + proj_name + str(topo.sim.time)));
 
 
 import matplotlib.gridspec as gridspec
