@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd -V
-#$ -l h_rt=5:00
+#$ -l h_rt=5:00:00
 #$ -q ecdf
 #$ -R y
 #$ -pe OpenMP 1
