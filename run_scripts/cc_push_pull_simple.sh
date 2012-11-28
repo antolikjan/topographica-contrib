@@ -1,9 +1,9 @@
 #!/bin/bash
 #$ -cwd -V
-#$ -l h_rt=43:59:00
+#$ -l h_rt=5:00
 #$ -q ecdf
 #$ -R y
-#$ -pe OpenMP 4
+#$ -pe OpenMP 1
 #$ -N cc_lissom_pp
 echo 'starting'
 argsprefix="analysis_scale=0.3,"
@@ -111,6 +111,6 @@ args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_bat
 
 a="$args 'A$1', $argsprefix ${arguments[$1]}  )"
 echo "${a}"
-/exports/home/s0570140/go_new/topographica/topographica -c openmp=True  -c openmp_threads=4 -c "${a}"
+/exports/home/s0570140/go_new/topographica/topographica -c openmp=True  -c openmp_threads=1 -c "${a}"
 
 
