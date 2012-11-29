@@ -327,7 +327,9 @@ def circ_mean(matrix, weights=None, axis=None, low=0, high=numpy.pi*2,
 
 def analyse_push_pull_connectivity():
     _analyse_push_pull_connectivity('V1Simple','V1SimpleExcToExc')
+    _analyse_push_pull_connectivity('V1Simple','V1SimpleExcToInh')
     _analyse_push_pull_connectivity('V1Simple','V1SimpleInhToExc')
+    _analyse_push_pull_connectivity('V1Simple','V1SimpleInhToInh')
     #_analyse_push_pull_connectivity('V1Complex','LateralExcitatory')
 
 def _analyse_push_pull_connectivity(sheet_name,proj_name):
@@ -339,6 +341,7 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
     phase_pref = topo.sim[sheet_name].sheet_views['PhasePreference'].view()[0]*numpy.pi*2
     
     app  = []
+    app_or = []
     av1 = []
     av2 = []
     for (i,cf) in enumerate(projection.cfs.flatten()):
@@ -347,6 +350,10 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
         ors = cf.input_sheet_slice.submatrix(or_pref).flatten()
         phases = cf.input_sheet_slice.submatrix(phase_pref).flatten()
         weights = numpy.multiply(cf.weights,cf.mask)
+        
+        #Let's compute the mean orientation preference of connecting neurons
+        z = circ_mean(numpy.array([ors]),weights=numpy.array([weights.flatten()]),axis=1,low=0.0,high=numpy.pi,normalize=False)
+        app_or.append(z[0])
         
         #First lets compute the average phase of neurons which are within 30 degrees of the given neuron
         within_30_degrees = numpy.nonzero((circular_dist(ors,this_or,numpy.pi) < (numpy.pi/6.0))*1.0)[0]
@@ -374,9 +381,10 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
     import pylab
     pylab.figure()
     pylab.subplot(3,1,1)
-    pylab.plot(numpy.array(app),phase_pref.flatten()*numpy.pi*2,'ro')
+    pylab.plot(numpy.array(app_or),or_pref.flatten()*numpy.pi,'ro')
+    pylab.title(proj_name)
     pylab.subplot(3,1,2)
-    pylab.hist(phase_pref.flatten()*numpy.pi*2)
+    pylab.plot(numpy.array(app),phase_pref.flatten()*numpy.pi*2,'ro')
     pylab.subplot(3,1,3)
     pylab.bar(numpy.arange(2), (numpy.mean(av1),numpy.mean(av2)),   0.35, color='b')
     
