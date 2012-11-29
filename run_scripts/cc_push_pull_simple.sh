@@ -49,7 +49,7 @@ arguments=(
 "A=35,CS=0.05,ImageScale=0.35,AFF_lr=0.5,MUE=0.03,MUI=0.03,SETAE=0.004,SETAI=0.002,default_density=160,LGNStr=4.5,SEEStr=0.1,SEIStr=1.0,SIEStr=-2.0,SIIStr=-1.0,Inbalance=0.0,reset_period=1,SS=1,PP_lr=0.2"
 "A=36,CS=0.05,ImageScale=0.35,AFF_lr=0.5,MUE=0.03,MUI=0.03,SETAE=0.004,SETAI=0.002,default_density=160,LGNStr=4.5,SEEStr=0.1,SEIStr=1.0,SIEStr=-2.0,SIIStr=-1.0,Inbalance=0.0,reset_period=1,SS=1,PP_lr=0.3")
 
-args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/push_pull_simple.ty",analysis_fn=contrib.jaanalysis.push_pull_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/PPS02/",times=[5000,10007],snapshot=False,dirname_prefix='
+args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/push_pull_simple.ty",analysis_fn=contrib.jaanalysis.push_pull_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/PPS03/",times=[5000,10007],snapshot=False,dirname_prefix='
 
 a="$args 'A$1', $argsprefix ${arguments[$1]}  )"
 echo "${a}"
