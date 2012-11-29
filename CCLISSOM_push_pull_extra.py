@@ -381,10 +381,10 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
     import pylab
     pylab.figure()
     pylab.subplot(3,1,1)
-    pylab.plot(numpy.array(app_or),or_pref.flatten()*numpy.pi,'ro')
+    pylab.plot(numpy.array(app_or),or_pref.flatten(),'ro')
     pylab.title(proj_name)
     pylab.subplot(3,1,2)
-    pylab.plot(numpy.array(app),phase_pref.flatten()*numpy.pi*2,'ro')
+    pylab.plot(numpy.array(app),phase_pref.flatten(),'ro')
     pylab.subplot(3,1,3)
     pylab.bar(numpy.arange(2), (numpy.mean(av1),numpy.mean(av2)),   0.35, color='b')
     
