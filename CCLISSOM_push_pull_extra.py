@@ -327,9 +327,9 @@ def circ_mean(matrix, weights=None, axis=None, low=0, high=numpy.pi*2,
 
 def analyse_push_pull_connectivity():
     _analyse_push_pull_connectivity('V1Simple','V1SimpleExcToExc')
-    _analyse_push_pull_connectivity('V1Simple','V1SimpleExcToInh')
+    _analyse_push_pull_connectivity('V1SimpleInh','V1SimpleExcToInh')
     _analyse_push_pull_connectivity('V1Simple','V1SimpleInhToExc')
-    _analyse_push_pull_connectivity('V1Simple','V1SimpleInhToInh')
+    _analyse_push_pull_connectivity('V1SimpleInh','V1SimpleInhToInh')
     #_analyse_push_pull_connectivity('V1Complex','LateralExcitatory')
 
 def _analyse_push_pull_connectivity(sheet_name,proj_name):
