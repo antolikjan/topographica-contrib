@@ -49,15 +49,15 @@ zeroInput = topo.pattern.Null();
 # Set up the helper function for jittering of the afferent connectivity
 class Jitter(CoordinateMapperFn):
     """Return the jittered x,y coordinate of the given coordinate."""
-    scale =  0.5
+    scale =  0.0
     rand = param.Parameter(default=None)
     def __call__(self,x,y):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
 
 jitterOn = Jitter(rand =numbergen.UniformRandom(seed=1023))
 jitterOff = Jitter(rand =numbergen.UniformRandom(seed=1023))
-jitterOnInh = Jitter(rand =numbergen.UniformRandom(seed=1023))
-jitterOffInh = Jitter(rand =numbergen.UniformRandom(seed=1023))
+jitterOnInh = Jitter(rand =numbergen.UniformRandom(seed=13))
+jitterOffInh = Jitter(rand =numbergen.UniformRandom(seed=13))
 
 
 # Specify weight initialization, response function, and learning function
