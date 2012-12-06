@@ -337,8 +337,10 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
     It assumes orientation preference was already measured.
     """
     projection = topo.sim[sheet_name].projections()[proj_name]
-    or_pref = topo.sim[sheet_name].sheet_views['OrientationPreference'].view()[0]*numpy.pi
-    phase_pref = topo.sim[sheet_name].sheet_views['PhasePreference'].view()[0]*numpy.pi*2
+    or_pref = topo.sim[projection.src.name].sheet_views['OrientationPreference'].view()[0]*numpy.pi
+    phase_pref = topo.sim[projection.src.name].sheet_views['PhasePreference'].view()[0]*numpy.pi*2
+    or_pref_target = topo.sim[projection.dest.name].sheet_views['OrientationPreference'].view()[0]*numpy.pi
+    phase_pref_target = topo.sim[projection.dest.name].sheet_views['PhasePreference'].view()[0]*2*numpy.pi
     
     app  = []
     app_or = []
@@ -357,11 +359,12 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
         
         #First lets compute the average phase of neurons which are within 30 degrees of the given neuron
         within_30_degrees = numpy.nonzero((circular_dist(ors,this_or,numpy.pi) < (numpy.pi/6.0))*1.0)[0]
-        if len(within_30_degrees) != 0:
-            z = circ_mean(numpy.array([phases[within_30_degrees]]),weights=numpy.array([weights.flatten()[within_30_degrees]]),axis=1,low=0.0,high=numpy.pi*2,normalize=False)
-            app.append(z[0])
-        else:
-            app.append(0.0)
+        #if len(within_30_degrees) != 0:
+        z = circ_mean(numpy.array([phases]),weights=numpy.array([weights.flatten()]),axis=1,low=0.0,high=numpy.pi*2,normalize=False)
+        app.append(z[0])
+        
+        #else:
+        #    app.append(0.0)
             
         #Now lets compare the average connection strength to neurons oriented within 30 degrees and having the same phase (within 60 degrees), with the average connections strength to neurons more than 30 degrees off in orientation
         outside_30_degrees = numpy.nonzero(circular_dist(ors,this_or,numpy.pi) > numpy.pi/6.0)[0]
@@ -381,15 +384,15 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
     import pylab
     pylab.figure()
     pylab.subplot(3,1,1)
-    pylab.plot(numpy.array(app_or),or_pref.flatten(),'ro')
+    pylab.plot(numpy.array(app_or),or_pref_target.flatten(),'ro')
     pylab.title(proj_name)
     pylab.subplot(3,1,2)
-    pylab.plot(numpy.array(app),phase_pref.flatten(),'ro')
+    pylab.plot(numpy.array(app),phase_pref_target.flatten(),'ro')
     pylab.subplot(3,1,3)
     pylab.bar(numpy.arange(2), (numpy.mean(av1),numpy.mean(av2)),   0.35, color='b')
     
     from param import normalize_path
-    pylab.savefig(normalize_path('PPconnectivity: ' + sheet_name + '|' + proj_name + str(topo.sim.time()) + '.png'));
+    pylab.savefig(normalize_path('PPconnectivity: ' + proj_name + str(topo.sim.time()) + '.png'));
 
 
 import matplotlib.gridspec as gridspec
