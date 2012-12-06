@@ -49,7 +49,7 @@ zeroInput = topo.pattern.Null();
 # Set up the helper function for jittering of the afferent connectivity
 class Jitter(CoordinateMapperFn):
     """Return the jittered x,y coordinate of the given coordinate."""
-    scale =  0.0
+    scale =  0.5
     rand = param.Parameter(default=None)
     def __call__(self,x,y):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
@@ -143,7 +143,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.025,dest_port=('Activity','JointNorm
                  coord_mapper=jitterOn,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value = __main__.__dict__.get('AFF_lr',0.1),
-                                                time_constant=16000))))
+                                                time_constant=160000))))
 
 
 topo.sim.connect('LGNOff','V1Simple',delay=0.025,dest_port=('Activity','JointNormalize', 'Afferent'),
@@ -154,7 +154,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.025,dest_port=('Activity','JointNor
                  coord_mapper=jitterOff,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value = __main__.__dict__.get('AFF_lr',0.1),
-                                                time_constant=16000))))
+                                                time_constant=160000))))
 
 topo.sim.connect('LGNOn','V1SimpleInh',delay=0.025,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=LGNOnStr,name='LGNOnInhAfferent',
@@ -164,7 +164,7 @@ topo.sim.connect('LGNOn','V1SimpleInh',delay=0.025,dest_port=('Activity','JointN
                  coord_mapper=jitterOffInh,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value = __main__.__dict__.get('AFF_lr_inh',__main__.__dict__.get('AFF_lr',0.1)),
-                                                time_constant=16000))))
+                                                time_constant=160000))))
 
 
 topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','JointNormalize', 'Afferent'),
@@ -175,7 +175,7 @@ topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','Joint
                  coord_mapper=jitterOnInh,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value =__main__.__dict__.get('AFF_lr_inh',__main__.__dict__.get('AFF_lr',0.1)),
-                                                time_constant=16000))))
+                                                time_constant=160000))))
 
 
 topo.sim.connect('V1Simple','V1Simple',delay=0.025,
