@@ -180,27 +180,31 @@ topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','Joint
 
 topo.sim.connect('V1Simple','V1Simple',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SEEStr',0.5),name='V1SimpleExcToExc',
-                 #weights_generator=Gaussian(aspect_ratio=1.0, size=0.5),
-                 nominal_bounds_template=BoundingBox(radius=10.0),learning_rate=__main__.__dict__.get('PP_lr',0.1))
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=0.1),
+                 cf_shape=topo.pattern.Disk(smoothing=0.0),
+                 nominal_bounds_template=BoundingBox(radius=0.15),learning_rate=__main__.__dict__.get('PP_lr',0.1))
 
 
 topo.sim.connect('V1Simple','V1SimpleInh',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('SEIStr',1.0),name='V1SimpleExcToInh',
-                 #weights_generator=Gaussian(aspect_ratio=1.0, size=0.5),
-                 nominal_bounds_template=BoundingBox(radius=10.0),learning_rate=__main__.__dict__.get('PP_lr',0.1))
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=0.1),
+                 cf_shape=topo.pattern.Disk(smoothing=0.0),
+                 nominal_bounds_template=BoundingBox(radius=0.15),learning_rate=__main__.__dict__.get('PP_lr',0.1))
 
 
 topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,
              connection_type=CFProjection,strength=__main__.__dict__.get('SIEStr',-0.5),name='V1SimpleInhToExc',
-             #weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
-             nominal_bounds_template=BoundingBox(radius=10.0),
+             weights_generator=Gaussian(aspect_ratio=1.0, size=0.1),
+             nominal_bounds_template=BoundingBox(radius=0.15),
+             cf_shape=topo.pattern.Disk(smoothing=0.0),
              learning_fn = CFPLF_KeyserRule("V1Simple",['V1SimpleInhToExc']),learning_rate=__main__.__dict__.get('PP_lr',0.1))
 
 
 topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
              connection_type=CFProjection,strength=__main__.__dict__.get('SIIStr',-0.5),name='V1SimpleInhToInh',
-             #weights_generator=Gaussian(aspect_ratio=1.0, size=0.3),
-             nominal_bounds_template=BoundingBox(radius=10.0),
+             weights_generator=Gaussian(aspect_ratio=1.0, size=0.1),
+             nominal_bounds_template=BoundingBox(radius=0.15),
+             cf_shape=topo.pattern.Disk(smoothing=0.0),
              learning_fn = CFPLF_KeyserRule("V1SimpleInh",['V1SimpleInhToInh']),learning_rate=__main__.__dict__.get('PP_lr',0.1))
 
 
