@@ -22,7 +22,7 @@ arguments=(
 )
  
 
-args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/CCLISSOM_push_pull.ty",analysis_fn=contrib.jaanalysis.push_pull_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/CCLISSOMPP32/",times=[5001,10006],snapshot=False,dirname_prefix='
+args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/CCLISSOM_push_pull.ty",analysis_fn=contrib.jaanalysis.push_pull_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/CCLISSOMPP32/",times=[5001,10006,10007],snapshot=False,dirname_prefix='
 
 a="$args 'A$1', $argsprefix ${arguments[$1]}  )"
 echo "${a}"
