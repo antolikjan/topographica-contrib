@@ -205,16 +205,18 @@ def push_pull_analysis_function():
     # Plot all projections for all measured_sheets
     for s in measured_sheets:
         for p in s.projections().values():
-            save_plotgroup("Projection",projection=p,density=100.0)
+            save_plotgroup("Projection",projection=p)
 
+    print 'Starting push pull analysis'	
     analyse_push_pull_connectivity()
+    print 'Finished push pull analysis'
     
     if(float(topo.sim.time()) >= 10005.0): 
         print 'Measuring orientations'
         SinusoidalMeasureResponseCommand.frequencies=[2.4]
         topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1Simple"])()
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1Simple"],coords=[(0,0)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0.1]",sheet=topo.sim["V1Simpe"],coords=[(0.1,0.1)])()
+        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0.1]",sheet=topo.sim["V1Simple"],coords=[(0.1,0.1)])()
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,-0.1]",sheet=topo.sim["V1Simple"],coords=[(0.1,-0.1)])()
         
 
