@@ -275,11 +275,9 @@ def secondStage():
 # change the default parameters of the measuring commands to obtain better quality and match the paper
 from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand,FeatureCurveCommand
 FeatureMaps.num_orientation=16
-MeasureResponseCommand.scale=3.0
+MeasureResponseCommand.scale=1.0
 MeasureResponseCommand.duration=4.0
-SinusoidalMeasureResponseCommand.duration=16.0
-FeatureCurveCommand.num_orientation=20
-FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
+
 
 # model exploration
 import contrib.modelparametrization
@@ -314,8 +312,8 @@ parameter_values = [ [1.0],
 #                     [4.0],
 #                   ]
 
-topo.sim.run(480.0)                   
-z = domains_stability_test(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex"],None,"FakeRetina",0,'Activities')
+#topo.sim.run(480.0)                   
+#z = domains_stability_test(parameters,parameter_values,["V1Simple","V1SimpleInh","V1Complex"],None,"FakeRetina",0,'Activities')
 #topo.sim.run(120.0)
 #z.pre_test()
 
