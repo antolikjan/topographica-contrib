@@ -177,6 +177,7 @@ def push_pull_analysis_function():
     from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
     import contrib.jacommands
     from contrib.CCLISSOM_push_pull_extra import analyse_push_pull_connectivity
+    from param import normalize_path
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
     
     print 'Analysing'
@@ -206,7 +207,9 @@ def push_pull_analysis_function():
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p,density=1.0)
 
+    print 'Starting push pull analysis'	
     analyse_push_pull_connectivity()
+    print 'Finished push pull analysis'
     
     if(float(topo.sim.time()) >= 10005.0): 
         print 'Measuring orientations'
@@ -215,17 +218,6 @@ def push_pull_analysis_function():
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1Simple"],coords=[(0,0)])()
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0.1]",sheet=topo.sim["V1Simple"],coords=[(0.1,0.1)])()
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,-0.1]",sheet=topo.sim["V1Simple"],coords=[(0.1,-0.1)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,0.1]",sheet=topo.sim["V1Simple"],coords=[(-0.1,0.1)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,-0.1]",sheet=topo.sim["V1Simple"],coords=[(-0.1,-0.1)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.2,0.2]",sheet=topo.sim["V1Simple"],coords=[(0.2,0.2)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.2,-0.2]",sheet=topo.sim["V1Simple"],coords=[(0.2,-0.2)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.2,0.2]",sheet=topo.sim["V1Simple"],coords=[(-0.2,0.2)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.2,-0.2]",sheet=topo.sim["V1Simple"],coords=[(-0.2,-0.2)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0.1]",sheet=topo.sim["V1Simple"],coords=[(0.0,0.1)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.1]",sheet=topo.sim["V1Simple"],coords=[(0.0,-0.1)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,0]",sheet=topo.sim["V1Simple"],coords=[(-0.1,0.0)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0]",sheet=topo.sim["V1Simple"],coords=[(0.1,-0.0)])()
-
         
 
 def complex_surround_analysis_function():

@@ -67,8 +67,8 @@ class Jitterer(PatternGenerator):
             generator.force_new_dynamic_value('scale')
             discards = self.orientation
             
-        (a, b, c) = (generator.x, generator.y, generator.scale)   
-        return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x + self.jitter_magnitude * self.r(), y=self.y + self.jitter_magnitude * self.r(), orientation=self.inspect_value("orientation"), index=self.inspect_value("index"))
+        (a, b, c) = (generator.x, generator.y, generator.scale)  
+        return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x + self.jitter_magnitude * self.r(), y=self.y + self.jitter_magnitude * self.r(),  index=self.inspect_value("index"))
 
 
 def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
