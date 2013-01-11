@@ -7,7 +7,7 @@
 #$ -N cc_lissom_pp
 echo 'starting'
 argsprefix="analysis_scale=0.3,"
-
+source ./virt_envs/topo/bin/activate
 let "a=RANDOM/1600"
 sleep $a
 

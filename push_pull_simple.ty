@@ -33,7 +33,9 @@ inputs=[topo.pattern.image.FileImage(filename=f,
 	            x=0,y=0,scale=__main__.__dict__.get('ImageScale',0.55),orientation=0)
         for f in image_filenames]
 
+
 input = Jitterer(generator=topo.pattern.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=15,jitter_magnitude=0.4)
+
 ring = topo.pattern.Composite(operator=numpy.add,x=numbergen.UniformRandom(lbound=-1.0,ubound=1.0,seed=12),
                                     y=numbergen.UniformRandom(lbound=-1.0,ubound=1.0,seed=36),
 		                    generators=[topo.pattern.Ring(size=0.5, aspect_ratio=1.0, scale=0.064,thickness=0.02,
