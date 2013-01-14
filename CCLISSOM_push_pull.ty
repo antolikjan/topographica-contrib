@@ -27,7 +27,7 @@ from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
 topo.sim.name = "cclissom_push_pull"
 #### Set up retinal inputs
 
-image_filenames=["/exports/home/s0570140/go_new/topographica/images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
+image_filenames=["./images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
 inputs=[topo.pattern.image.FileImage(filename=f,
 	            size=10.0,  #size_normalization='original',(size=10.0)
 	            x=0,y=0,scale=__main__.__dict__.get('ImageScale',0.55),orientation=0)

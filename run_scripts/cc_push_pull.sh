@@ -21,7 +21,7 @@ arguments=(
 "A=5,BasedOn='CCLISSOMPP26|A16',ImageScale=0.35,AFF_lr=0.4,StoCStr=4.0,MUE=0.006,MUI=0.008,SETAE=0.004,SETAI=0.002,default_density=96,LGNStr=4,SEEStr=1.0,SEIStr=0.5,SIEStr=-5.7,SIIStr=-5.7,CEFeedback=0.14,CIFeedback=0.2,SEElr=0.3,SEIlr=0.3,SIElr=0.3,SIIlr=0.3")
  
 
-args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/CCLISSOM_push_pull.ty",analysis_fn=contrib.jaanalysis.push_pull_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/CCLISSOMPP32/",times=[5001,10005],snapshot=False,dirname_prefix='
+args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/CCLISSOM_push_pull.ty",analysis_fn=contrib.jaanalysis.push_pull_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/CCLISSOMPP32/",times=[10005],snapshot=False,dirname_prefix='
 
 a="$args 'A$1', $argsprefix ${arguments[$1]}  )"
 echo "${a}"

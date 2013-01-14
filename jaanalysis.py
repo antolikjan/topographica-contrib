@@ -210,7 +210,7 @@ def push_pull_analysis_function():
     print 'Starting push pull analysis'	
     analyse_push_pull_connectivity()
     print 'Finished push pull analysis'
-    
+    return
     if(float(topo.sim.time()) >= 10005.0): 
         print 'Measuring orientations'
         SinusoidalMeasureResponseCommand.frequencies=[2.4]
