@@ -199,13 +199,13 @@ def push_pull_analysis_function():
     FeatureCurveCommand.curve_parameters=[{"contrast":30},{"contrast":50},{"contrast":70},{"contrast":90}]
     
     save_plotgroup("Orientation Preference and Complexity")
-    save_plotgroup("Activity")
+    save_plotgroup("Activity",normalize="Individually")
 
 									
     # Plot all projections for all measured_sheets
     for s in measured_sheets:
         for p in s.projections().values():
-            save_plotgroup("Projection",projection=p,density=1.0)
+            save_plotgroup("Projection",projection=p,density=3.0)
 
     print 'Starting push pull analysis'	
     analyse_push_pull_connectivity()
