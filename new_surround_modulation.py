@@ -14,14 +14,23 @@ import pickle
 import matplotlib.gridspec as gridspec
 from matplotlib import rc
 rc('text', usetex=True)
+rc('mathtext',default='regular')
+pylab.rc(('xtick.major','xtick.minor','ytick.major','ytick.minor'), pad=8)    
+rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+fontProperties = {'family':'sans-serif','sans-serif':['Helvetica'],
+    'weight' : 'normal', 'size' : 0}
+rc('xtick', labelsize=20)
+rc('ytick', labelsize=20)
+rc('legend',fontsize=20)
+rc('legend',linewidth=2)
+rc('legend',labelspacing=0.25)
 
 prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/'
-prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2'
+prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test'
 
 
 normalize_path.prefix = prefix_out
 
-pylab.rc(('xtick.major','xtick.minor','ytick.major','ytick.minor'), pad=8)    
 
 def release_fig(filename=None):
     fullname=filename+".png"
@@ -197,6 +206,8 @@ class SurroundModulationPlotting():
         ax = pylab.gca()
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+        ax.set_xticklabels(ax.get_xticks(), fontProperties)
+        ax.set_yticklabels(ax.get_yticks(), fontProperties)
         ax.set_xlim(0,2)  
         ax.set_xticks([0,1,2])
         m = numpy.ceil(m)
@@ -290,8 +301,9 @@ class SurroundModulationPlotting():
             pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
             ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
             ax.set_xticks([-numpy.pi/2,0,numpy.pi/2.0])
-            ax.set_xticklabels(['-pi/2','0','pi/2'])
             
+	    ax.set_yticklabels(ax.get_yticks(), fontProperties)
+            ax.set_xticklabels([r'-$\frac{\mathrm{\mathsf{\pi}}{2}$',r'0',r'$\frac{\mathrm{\mathsf{\pi}}{2}$'], fontProperties)            
             # get ceil at first decimal point
             m = numpy.ceil(m)
             ax.set_yticks([0.1,m/2,m])
@@ -361,7 +373,9 @@ class SurroundModulationPlotting():
 
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)  
- 
+        pylab.gca().set_xticklabels(pylab.gca().get_xticks(), fontProperties)
+	pylab.gca().set_yticklabels(pylab.gca().get_yticks(), fontProperties)
+
         if independent:
             release_fig("AverageSTC")
    
@@ -432,7 +446,6 @@ class SurroundModulationPlotting():
             ax.errorbar(x_values, average_curves[curve_label]*100, lw=1, ecolor=colors[i], yerr=sem_curves[curve_label]*100, fmt=None) 
             ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
             ax.set_xticks([-numpy.pi/2,0,numpy.pi/2.0])
-            ax.set_xticklabels(['-pi/2','0','pi/2'])
             ax.set_yticks([0,50,100])
             ax.set_yticklabels(['0%','50%','100%'])
             ax.set_ylim(0,110)
@@ -443,6 +456,9 @@ class SurroundModulationPlotting():
         disable_top_right_axis(pylab.gca())
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+        pylab.gca().set_xticklabels([r'-$\frac{\pi}{2}$',r'0',r'$\frac{\pi}{2}$'], fontProperties)
+	pylab.gca().set_yticklabels(pylab.gca().get_yticks(), fontProperties)
+
         if independent:
             release_fig("AverageOCTC") 
 
@@ -487,9 +503,9 @@ class SurroundModulationPlotting():
                     ax = pylab.gca()
                     disable_left_axis(ax)
                     disable_top_right_axis(ax)
-                    pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
-                    ax.xaxis.set_major_locator(MaxNLocator(4))
                     remove_y_tick_labels()
+                    ax.xaxis.set_major_locator(MaxNLocator(4))
+                    pylab.setp(pylab.getp(ax, 'xticklabels'), fontsize=20)
                     #f.axvline(x=numpy.mean(histograms_lc[key]),linewidth=4, color='r')
                     
                     release_fig("Histogram<" + key + ">")
@@ -557,7 +573,8 @@ class SurroundModulationPlotting():
         disable_top_right_axis(pylab.gca())
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
-        
+	pylab.gca().set_xticklabels(pylab.gca().get_xticks(), fontProperties)
+	pylab.gca().set_yticklabels(pylab.gca().get_yticks(), fontProperties)        
 
         lc_x,lc_y = zip(*[(-0.0487, -0.0419),(1.3979, 6.7485),(2.0126, 8.1943),(2.8208, 10.3224),(3.9922, 4.6368),(5.6557, 3.5735),(7.947, 5.1138),(11.0084, 4.837)])
         mc_x,mc_y = zip(*[(-0.0487, -0.0419),(1.347, 13.4836),(1.9927, 15.4864),(2.7962, 13.3683),(4.0149, 8.2393),(5.6128, 7.3489),(7.9576, 7.1724),(11.0201, 6.5096)])
@@ -580,6 +597,8 @@ class SurroundModulationPlotting():
         disable_top_right_axis(pylab.gca())
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+	pylab.gca().set_xticklabels(pylab.gca().get_xticks(), fontProperties)
+	pylab.gca().set_yticklabels(pylab.gca().get_yticks(), fontProperties)        
 
 
         lc_x,lc_y = zip(*[(0.665, 14.9452),(1.0443, 22.295),(1.5573, 27.5117),(2.2633, 32.0173),(3.3754, 37.7079),(5.2272, 28.233),(7.5956, 30.1319),(11.9241, 32.2685),(17.7866, 40.8027),(26.8654, 43.6499)])
@@ -596,13 +615,15 @@ class SurroundModulationPlotting():
         ax.semilogx(lc_x,mc_y,lw=3,color='g')   
         ax.semilogx(lc_x,hc_y,lw=3,color='b')   
         ax.set_xlim(0.6,30)  
-        ax.set_xticks([0.1,0.3,1.0,3.0,10,30,100])
+        ax.set_xticks([0.5,1.0,3.0,10,50])
         ax.set_ylim(0,100)  
-        ax.set_yticks([0,50,100])
+        ax.set_yticks([0.0,50.0,100])
         ax.set_ylabel('Response', fontsize=20)
         disable_top_right_axis(pylab.gca())
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+	pylab.gca().set_xticklabels(pylab.gca().get_xticks(), fontProperties)
+	pylab.gca().set_yticklabels(pylab.gca().get_yticks(), fontProperties)        
                 
 
         
@@ -659,13 +680,15 @@ class SurroundModulationPlotting():
         ax.plot(x,oy,lw=3,color='b')      
         ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
         ax.set_xticks([-numpy.pi/2,0,numpy.pi/2.0])
-        ax.set_xticklabels(['-pi/2','0','pi/2'])
         ax.set_ylim(0,50)  
         ax.set_yticks([0,25,50])
         ax.set_ylabel('Response', fontsize=20)
         disable_top_right_axis(pylab.gca())
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+        pylab.gca().set_xticklabels([r'-$\frac{\pi}{2}$',r'0',r'$\frac{\pi}{2}$'], fontProperties)
+	ax.set_yticklabels(ax.get_yticks(), fontProperties)
+
         
         x,y = zip(*[(-90.5455, 0.6447),(-67.5208, 0.6732),(-45.9417, 0.572),(-22.6714, 0.4924),(-0.5531, 0.3234),(22.8077, 0.5215),(45.0244, 0.6539),(67.7793, 0.7153),(89.9339, 0.6573)])
         x = numpy.array(x)
@@ -675,13 +698,14 @@ class SurroundModulationPlotting():
         ax.plot(x,y,lw=3,color='r')      
         ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
         ax.set_xticks([-numpy.pi/2,0,numpy.pi/2.0])
-        ax.set_xticklabels(['-pi/2','0','pi/2'])
         ax.set_ylim(0,1.0)  
         ax.set_yticks([0,0.5,1.0])
         ax.set_ylabel('Relative response', fontsize=20)
         disable_top_right_axis(pylab.gca())
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+        pylab.gca().set_xticklabels([r'-$\frac{\pi}{2}$',r'0',r'$\frac{\pi}{2}$'], fontProperties)
+	ax.set_yticklabels(ax.get_yticks(), fontProperties)
         
         
             
@@ -704,7 +728,12 @@ class SurroundModulationPlotting():
         pylab.scatter(raster_plots["or_suppression"][1],raster_plots["or_suppression"][0],s=18, facecolor = 'r',lw = 0)
         pylab.plot(raster_plots["or_suppression"][1],m*numpy.array(raster_plots["or_suppression"][1])+b,'-k',linewidth=2)
         disable_top_right_axis(ax)
+        ax.xaxis.set_major_locator(MaxNLocator(4))
+        ax.yaxis.set_major_locator(MaxNLocator(4))
         pylab.ylabel('Orientation-contrast suppression', fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+
         
         ax = pylab.subplot(gs[0,1])
         m,b = numpy.polyfit(raster_plots["SSI"][1],raster_plots["SSI"][0],1)
@@ -712,7 +741,12 @@ class SurroundModulationPlotting():
         pylab.scatter(raster_plots["SSI"][1],raster_plots["SSI"][0],s=18, facecolor = 'r',lw = 0)
         pylab.plot(raster_plots["SSI"][1],m*numpy.array(raster_plots["SSI"][1])+b,'-k',linewidth=2)
         disable_top_right_axis(ax)
+        ax.xaxis.set_major_locator(MaxNLocator(4))
+        ax.yaxis.set_major_locator(MaxNLocator(4))
         pylab.ylabel('Surround selectivity index', fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+
         
         print raster_plots.keys()
         
@@ -722,7 +756,12 @@ class SurroundModulationPlotting():
         pylab.scatter(raster_plots["suppresion_index"][1],raster_plots["suppresion_index"][0],s=18, facecolor = 'r',lw = 0)
         pylab.plot(raster_plots["suppresion_index"][1],m*numpy.array(raster_plots["suppresion_index"][1])+b,'-k',linewidth=2)
         disable_top_right_axis(ax)
+        ax.xaxis.set_major_locator(MaxNLocator(4))
+        ax.yaxis.set_major_locator(MaxNLocator(4))
         pylab.ylabel('Suppression index', fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
+        
 
         ax = pylab.subplot(gs[1,1])
         m,b = numpy.polyfit(raster_plots["counter_suppresion_index"][1],raster_plots["counter_suppresion_index"][0],1)
@@ -730,7 +769,11 @@ class SurroundModulationPlotting():
         pylab.scatter(raster_plots["counter_suppresion_index"][1],raster_plots["counter_suppresion_index"][0],s=18, facecolor = 'r',lw = 0)
         pylab.plot(raster_plots["counter_suppresion_index"][1],m*numpy.array(raster_plots["counter_suppresion_index"][1])+b,'-k',linewidth=2)
         disable_top_right_axis(ax)
+        ax.xaxis.set_major_locator(MaxNLocator(4))
+        ax.yaxis.set_major_locator(MaxNLocator(4))
         pylab.ylabel('Counter suppression index', fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
         
         
         ax = pylab.subplot(gs[2,0])
@@ -740,6 +783,10 @@ class SurroundModulationPlotting():
         disable_top_right_axis(ax)
         pylab.xlabel('Local homogeneity index', fontsize=20)
         pylab.ylabel('Modulation ratio', fontsize=20)
+        ax.xaxis.set_major_locator(MaxNLocator(4))
+        ax.yaxis.set_major_locator(MaxNLocator(4))
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
         
         
         ax = pylab.subplot(gs[2,1])
@@ -747,8 +794,12 @@ class SurroundModulationPlotting():
         xx,z = running_average(self.lhi.ravel(),self.OS.ravel())
         pylab.plot(xx,z,'k',lw=3.0)           
         disable_top_right_axis(ax)
+        ax.xaxis.set_major_locator(MaxNLocator(4))
+        ax.yaxis.set_major_locator(MaxNLocator(4))
         pylab.xlabel('Local homogeneity index', fontsize=20)
         pylab.ylabel('Orientation selectivity', fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
+        pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
 
         print scipy.stats.pearsonr(self.lhi.ravel(),self.OS.ravel())        
         print scipy.stats.pearsonr(self.lhi.ravel(),self.MR.ravel()*2)
