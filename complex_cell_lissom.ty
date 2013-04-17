@@ -10,7 +10,7 @@ __version__='$Revision: 8265 $'
 import numpy
 from math import pi, sqrt
 import param
-
+from topo.pattern import Selector, Null
 import topo.pattern
 import topo.pattern.random
 import topo.pattern.image
@@ -20,22 +20,227 @@ from topo.sheet import GeneratorSheet
 from topo.projection import CFProjection, SharedWeightCFProjection,OneToOneProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
+from topo.base.arrayutil import clip_lower
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.transferfn.misc import PatternCombine
-from topo.transferfn.misc import HalfRectify
-from topo.transferfn import PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,Sigmoid
+from topo.transferfn.misc import PatternCombine, HalfRectify, HomeostaticResponse
+from topo.transferfn import DivisiveNormalizeL1, Hysteresis, TransferFnWithState
 from topo import numbergen
 from topo.pattern import Gaussian
 from topo.base.functionfamily import CoordinateMapperFn
-from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Jitterer, AddGC, SimpleHomeoLinear, Expander
+from topo.base.patterngenerator import PatternGenerator, Constant 
 from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
 
 topo.sim.name = "complex_cell_lissom"
 
-#### Set up retinal inputs
+###########################################################################################################################
+###########################################################################################################################
+# Extra commands needed to setup model
 
+class SimpleHomeoLinear(TransferFnWithState):
+    mu = param.Number(default=0.01, doc="Target average activity.")
+    t_init = param.Number(default=0.0, doc="Threshold parameter")
+    alpha = param.Number(default=1.0, doc="Linear slope parameter")
+    eta = param.Number(default=0.0002, doc="Learning rate for homeostatic plasticity.")
+    smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
+    randomized_init = param.Boolean(False, doc="Whether to randomize the initial t parameter")
+    noise_magnitude = param.Number(default=0.1, doc="The magnitude of the additive noise to apply to the B parameter at initialization")
+
+    def __init__(self, **params):
+        super(SimpleHomeoLinear, self).__init__(**params)
+        self.first_call = True
+        self.__current_state_stack=[]
+        
+    def __call__(self, x):
+       
+        if self.first_call:
+            self.first_call = False
+            if self.randomized_init:
+                self.t = ones(x.shape, x.dtype.char) * self.t_init + (topo.pattern.random.UniformRandom(seed=123)(xdensity=x.shape[0], ydensity=x.shape[1]) - 0.5) * self.noise_magnitude * 2
+            else:
+                self.t = ones(x.shape, x.dtype.char) * self.t_init
+            
+            self.y_avg = ones(x.shape, x.dtype.char) * self.mu
+        print type(x)
+        x_orig = x.copy()
+        x -= self.t
+        clip_lower(x, 0)
+        x *= self.alpha
+
+        if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
+            self.y_avg = (1.0 - self.smoothing) * x + self.smoothing * self.y_avg 
+            self.t += self.eta * (self.y_avg - self.mu)
+        
+    def state_push(self):
+        """
+        Save the current state of the output function to an internal stack.
+        """
+       
+        self.__current_state_stack.append((copy(self.t), copy(self.y_avg), copy(self.first_call)))
+        super(SimpleHomeoLinear, self).state_push()
+
+        
+    def state_pop(self):
+        """
+        Pop the most recently saved state off the stack.
+        
+        See state_push() for more details.
+        """
+       
+        self.t, self.y_avg, self.first_call = self.__current_state_stack.pop()
+        super(SimpleHomeoLinear, self).state_pop()
+
+
+class Jitterer(PatternGenerator):
+    """
+    PatternGenerator that moves another PatternGenerator over time in random directions from its origin.
+    
+    To create a pattern at a new location, it asks the underlying
+    PatternGenerator to create a new pattern at a location translated
+    by an amount based on the global time.
+    """
+
+    generator = param.ClassSelector(default=Constant(scale=0.0),
+        class_=PatternGenerator, doc="""Pattern to be translated.""")
+        
+    jitter_magnitude = param.Number(default=0.02, bounds=(0.0, None), doc="""
+        The speed with which the pattern should move,
+        in sheet coordinates per simulation time unit.""")
+    
+    reset_period = param.Number(default=1, bounds=(0.0, None), doc="""
+        When pattern position should be reset, usually to the value of a dynamic parameter.
+
+        The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
+    
+    last_time = 0.0
+
+
+    def __init__(self, **params):
+        super(Jitterer, self).__init__(**params)
+        self.orientation = params.get('orientation', self.orientation)
+        self.r =numbergen.UniformRandom(seed=1023)
+        self.index = 0
+        
+    def __call__(self, **params):
+        """Construct new pattern out of the underlying one."""
+        generator = params.get('generator', self.generator)
+        xdensity = params.get('xdensity', self.xdensity)
+        ydensity = params.get('ydensity', self.ydensity)
+        bounds = params.get('bounds', self.bounds)
+
+        if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <= 0.05)):
+            if ((float(topo.sim.time()) <= (self.last_time + self.reset_period + 1.0)) and (float(topo.sim.time()) >= 0.05))    :
+                return Null()(xdensity=xdensity, ydensity=ydensity, bounds=bounds)
+        
+            self.last_time += self.reset_period
+            # time to reset the parameter
+            (self.x, self.y, self.scale) = (generator.x, generator.y, generator.scale)
+            if isinstance(generator, Selector):
+                self.index = generator.index
+            generator.force_new_dynamic_value('x')
+            generator.force_new_dynamic_value('y')
+            generator.force_new_dynamic_value('scale')
+            discards = self.orientation
+            
+        (a, b, c) = (generator.x, generator.y, generator.scale)   
+        return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x + self.jitter_magnitude * self.r(), y=self.y + self.jitter_magnitude * self.r(), orientation=self.inspect_value("orientation"), index=self.inspect_value("index"))
+
+class Expander(PatternGenerator):
+    """
+    PatternGenerator that expands another PatternGenerator over time.
+    
+    To create a pattern at a new location, asks the underlying
+    PatternGenerator to create a new pattern expanded
+    by an amount based on the global time.
+    """
+
+    generator = param.ClassSelector(default=Constant(scale=0.0),
+        class_=PatternGenerator, doc="""Pattern to be translated.""")
+    
+    speed = param.Number(default=1, bounds=(0.0, None), doc="""
+        The speed with which the pattern should move,
+        in sheet coordinates per simulation time unit.""")
+    
+    reset_period = param.Number(default=1, bounds=(0.0, None), doc="""
+        When pattern position should be reset, usually to the value of a dynamic parameter.
+
+        The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
+    
+    last_time = 0.0
+
+
+    def __init__(self, **params):
+        super(Expander, self).__init__(**params)
+        self.size = params.get('size', self.size)
+        self.index = 0
+        self.last_time=0.0
+        
+    def __call__(self, **params):
+        """Construct new pattern out of the underlying one."""
+        generator = params.get('generator', self.generator)
+        xdensity = params.get('xdensity', self.xdensity)
+        ydensity = params.get('ydensity', self.ydensity)
+        bounds = params.get('bounds', self.bounds)
+
+        # CB: are the float() calls required because the comparisons
+        # involving FixedPoint fail otherwise? Or for some other
+        # reason?
+        if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <= 0.05)):
+            if ((float(topo.sim.time()) <= (self.last_time + self.reset_period + 1.0)) and (float(topo.sim.time()) >= 0.05))    :
+                return Null()(xdensity=xdensity, ydensity=ydensity, bounds=bounds)
+            if (float(topo.sim.time()) >= 0.05):
+                self.last_time += self.reset_period
+            # time to reset the parameter
+            (self.x, self.y) = (generator.x, generator.y)
+            if isinstance(generator, Selector):
+                self.index = generator.index
+            generator.force_new_dynamic_value('x')
+            generator.force_new_dynamic_value('y')
+
+        (a, b) = (generator.x, generator.y)   
+        # compute how much time elapsed from the last reset
+        t = float(topo.sim.time()) - self.last_time
+
+        ## CEBALERT: mask gets applied twice, both for the underlying
+        ## generator and for this one.  (leads to redundant
+        ## calculations in current lissom_oo_or usage, but will lead
+        ## to problems/limitations in the future).
+        return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x, y=self.y,
+             size=self.size + t * self.speed,index=self.index)
+
+
+# This command randomizes the strength of ON and OFF LGN inputs 
+def randomize_sheets_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
+    lgn_on_proj = topo.sim[sheet_name].in_connections[0]
+    lgn_off_proj = topo.sim[sheet_name].in_connections[1]
+    rand =numbergen.UniformRandom(seed=513)
+    rows, cols = lgn_on_proj.cfs.shape
+    for r in xrange(rows):
+        for c in xrange(cols):
+            cf_on = lgn_on_proj.cfs[r, c]
+            cf_off = lgn_off_proj.cfs[r, c]
+            del cf_on.norm_total
+            del cf_off.norm_total
+            ra = rand()
+
+            ra = (ra-0.5)*2.0 * prob
+
+            cf_on.weights *= 1-ra 
+            cf_off.weights *= (1 + ra)
+
+
+# Set up the helper function for jittering of the afferent connectivity
+class Jitter(CoordinateMapperFn):
+    """Return the jittered x,y coordinate of the given coordinate."""
+    scale =  0.5
+    rand = param.Parameter(default=None)
+    def __call__(self,x,y):
+        return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
+###########################################################################################################################
+###########################################################################################################################
+
+#### Set up retinal inputs
 image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
 inputs=[topo.pattern.image.FileImage(filename=f,
 	            size=10.0,  #size_normalization='original',(size=10.0)
@@ -54,15 +259,6 @@ ring = topo.pattern.Composite(operator=numpy.add,x=numbergen.UniformRandom(lboun
 retinal_waves=Expander(generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=15,speed=0.3)
 zeroInput = topo.pattern.Null();
 
-
-# Set up the helper function for jittering of the afferent connectivity
-class Jitter(CoordinateMapperFn):
-    """Return the jittered x,y coordinate of the given coordinate."""
-    scale =  0.5
-    rand = param.Parameter(default=None)
-    def __call__(self,x,y):
-        return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
-
 jitterOn = Jitter(rand =numbergen.UniformRandom(seed=1023))
 jitterOff = Jitter(rand =numbergen.UniformRandom(seed=1023))
 
@@ -75,6 +271,7 @@ CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
 
 # Set up transfer function and homeostatic mechanisms
 V1Simple_OF = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=0.003,eta=0.002)
+#V1Simple_OF = HomeostaticResponse(t_init=0.35,linear_slope=3,target_activity=0.003,learning_rate=0.002*18,seed=123,smoothing=0.9946,period=1.0)
 V1Complex_OF=HalfRectify()
 NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=0.02,offset=0.0),operator=numpy.add)
 
@@ -104,12 +301,12 @@ topo.sim['LGNOff']=LISSOM(nominal_density=48,
 
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=96,
                         nominal_bounds=BoundingBox(radius=0.5),
-                        output_fns=[ActivityHysteresis(time_constant=0.3),NN,V1Simple_OF])
+                        output_fns=[Hysteresis(time_constant=0.3),NN,V1Simple_OF])
 
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=96,
                         nominal_bounds=BoundingBox(radius=0.5),
-                        output_fns=[ActivityHysteresis(time_constant=0.3),V1Complex_OF])
+                        output_fns=[Hysteresis(time_constant=0.3),V1Complex_OF])
 
 # DoG weights for the LGN
 #centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
@@ -214,14 +411,4 @@ def secondStage():
     topo.sim['FakeRetina'].set_input_generator(zeroInput)
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
-    randomize_V1Simple_relative_LGN_strength(prob=0.5)
-
-
-# change the default parameters of the measuring commands to obtain better quality and match the paper
-from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand,FeatureCurveCommand
-FeatureMaps.num_orientation=16
-MeasureResponseCommand.scale=3.0
-MeasureResponseCommand.duration=4.0
-FeatureCurveCommand.num_orientation=20
-FeatureCurveCommand.curve_parameters=[{"contrast":10},{"contrast":90}]
-
+    randomize_sheets_relative_LGN_strength(prob=0.5)
