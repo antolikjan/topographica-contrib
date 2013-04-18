@@ -22,11 +22,15 @@ fontProperties = {'family':'sans-serif','sans-serif':['Helvetica'],
 rc('xtick', labelsize=20)
 rc('ytick', labelsize=20)
 rc('legend',fontsize=20)
-rc('legend',linewidth=2)
+#rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
 prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/'
-prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test'
+prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test1'
+
+
+#prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew4EEBig=9NEWJoined/'
+#prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew4EEBig=9NEWJoined/out'
 
 
 normalize_path.prefix = prefix_out
@@ -90,34 +94,34 @@ class SurroundModulationPlotting():
         self.recalculate_orientation_contrast_supression()
         self.recalculate_size_tuning_measures()
         
-        #for coords in self.data_dict.keys():
-        #    xindex,yindex = coords
-        #    self.plot_size_tunning(xindex,yindex)
-        #    self.plot_orientation_contrast_tuning(xindex,yindex)
+        for coords in self.data_dict.keys():
+            xindex,yindex = coords
+            self.plot_size_tunning(xindex,yindex)
+            self.plot_orientation_contrast_tuning(xindex,yindex)
         
-        #self.plot_histograms_of_measures()
+        self.plot_histograms_of_measures()
         #print('1')
-        #self.plot_average_size_tuning_curve()
+        self.plot_average_size_tuning_curve()
         #print('2')
-        #self.plot_average_oct()
+        self.plot_average_oct()
         #print('3')
         
         self.Figure6()
         print('4')
         self.Figure8()
         print('5')
-        return
-        #lhi = compute_local_homogeneity_index(self.OR*pi,1.5)    
-        #f = open(prefix+'lhi1.5.pickle','wb')            
+        
+        #lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
+        #f = open(prefix+'lhi2.0.pickle','wb')            
         #pickle.dump(lhi,f)
         #f.close()
                 
-        f = open(prefix+'lhi2.0.pickle','rb')            
+        f = open(prefix+'lhi6.0.pickle','rb')            
         self.lhi = pickle.load(f)
         
         raster_plots_lc,raster_plots_hc = self.plot_map_feature_to_surround_modulation_feature_correlations(self.lhi,"Local Homogeneity Index")
         self.correlations_figure(raster_plots_lc)
-        #self.plot_map_feature_to_surround_modulation_feature_correlations(self.OS,"OrientationSelectivity")
+        self.plot_map_feature_to_surround_modulation_feature_correlations(self.OS,"OrientationSelectivity")
         print len(self.data_dict)
         
     def recalculate_orientation_contrast_supression(self):
@@ -126,6 +130,16 @@ class SurroundModulationPlotting():
             
             for curve_label in measurment.keys():
                 if curve_label != 'ORTC':
+                    z = measurment['ORTC']['data']
+                    ar = []
+                    ors = []
+                    for o in z.keys():
+                        ar.append(z[o].view()[0][xindex][yindex])
+                        ors.append(o)
+                    peak_or_response = max(ar)
+                    assert ors[numpy.argmax(ar)] == measurment["ORTC"]["info"]["pref_or"]
+
+                    
                     curve =  measurment[curve_label]["data"]
                     
                     orr = measurment["ORTC"]["info"]["pref_or"]
@@ -134,8 +148,8 @@ class SurroundModulationPlotting():
                     pref_or_resp=curve[orr].view()[0][xindex][yindex]
                     cont_or_resp=curve[orr_ort].view()[0][xindex][yindex]
             
-                    if pref_or_resp != 0 and cont_or_resp != 0:
-                        measurment[curve_label]["measures"]["or_suppression"]=(pref_or_resp-cont_or_resp)/numpy.max([cont_or_resp,pref_or_resp])
+                    if peak_or_response != 0:
+                        measurment[curve_label]["measures"]["or_suppression"]=(cont_or_resp-pref_or_resp)/peak_or_response
                     else: 
                         measurment[curve_label]["measures"]["or_suppression"]=0.0
    
@@ -161,8 +175,12 @@ class SurroundModulationPlotting():
                 curve_data[curve_label]["measures"]["peak_supression"] = x_values[curve_data[curve_label]["measures"]["peak_supression_index"]]
                 curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[-1]) /  y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
                 #curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]]) /  y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
-
-                curve_data[curve_label]["measures"]["peak_far_facilitation_index"] = curve_data[curve_label]["measures"]["peak_supression_index"] + numpy.argmax(y_values[curve_data[curve_label]["measures"]["peak_supression_index"] + 1:]) + 1
+		
+		if len(y_values[curve_data[curve_label]["measures"]["peak_supression_index"] + 1:]) > 0:
+                    curve_data[curve_label]["measures"]["peak_far_facilitation_index"] = curve_data[curve_label]["measures"]["peak_supression_index"] + numpy.argmax(y_values[curve_data[curve_label]["measures"]["peak_supression_index"] + 1:]) + 1
+                else:
+            	    curve_data[curve_label]["measures"]["peak_far_facilitation_index"] = len(y_values)-1
+            	    
                 curve_data[curve_label]["measures"]["peak_far_facilitation"] = x_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]]
                 curve_data[curve_label]["measures"]["counter_suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
                 
@@ -254,7 +272,7 @@ class SurroundModulationPlotting():
                         for k in ks:                        
                             z.append(measurment["ORTC"]["data"][k].view()[0][xindex, yindex])
                         
-                        ssi = self.calculate_octc_selectivity(2*x_values,y_values-numpy.max(z))
+                        ssi = self.calculate_octc_selectivity(2*x_values,numpy.max(z)-y_values)
                         self.data_dict[(xindex,yindex)]["OCT"][curve_label]["measures"]["SSI"]=ssi
                         self.data_dict[(xindex,yindex)]["OCT"]['Contrastsurround = 100%']["measures"]["SSI"]=ssi
                         
@@ -303,7 +321,7 @@ class SurroundModulationPlotting():
             ax.set_xticks([-numpy.pi/2,0,numpy.pi/2.0])
             
 	    ax.set_yticklabels(ax.get_yticks(), fontProperties)
-            ax.set_xticklabels([r'-$\frac{\mathrm{\mathsf{\pi}}{2}$',r'0',r'$\frac{\mathrm{\mathsf{\pi}}{2}$'], fontProperties)            
+            #ax.set_xticklabels([r'-$\frac{\mathrm{\mathsf{\pi}}{2}$',r'0',r'$\frac{\mathrm{\mathsf{\pi}}{2}$'], fontProperties)            
             # get ceil at first decimal point
             m = numpy.ceil(m)
             ax.set_yticks([0.1,m/2,m])
@@ -778,8 +796,8 @@ class SurroundModulationPlotting():
         
         ax = pylab.subplot(gs[2,0])
         pylab.scatter(self.lhi.ravel(),self.MR.ravel()*2,s=3, facecolor = 'r',lw = 0)
-        xx,z = running_average(self.lhi.ravel(),self.MR.ravel()*2)
-        pylab.plot(xx,z,'k',lw=3.0)
+        #xx,z = running_average(self.lhi.ravel(),self.MR.ravel()*2)
+        #pylab.plot(xx,z,'k',lw=3.0)
         disable_top_right_axis(ax)
         pylab.xlabel('Local homogeneity index', fontsize=20)
         pylab.ylabel('Modulation ratio', fontsize=20)
@@ -791,8 +809,8 @@ class SurroundModulationPlotting():
         
         ax = pylab.subplot(gs[2,1])
         pylab.scatter(self.lhi.ravel(),self.OS.ravel(),s=3, facecolor = 'r',lw = 0)
-        xx,z = running_average(self.lhi.ravel(),self.OS.ravel())
-        pylab.plot(xx,z,'k',lw=3.0)           
+        #xx,z = running_average(self.lhi.ravel(),self.OS.ravel())
+        #pylab.plot(xx,z,'k',lw=3.0)           
         disable_top_right_axis(ax)
         ax.xaxis.set_major_locator(MaxNLocator(4))
         ax.yaxis.set_major_locator(MaxNLocator(4))
@@ -838,8 +856,8 @@ class SurroundModulationPlotting():
             for key in raster_plots_hc.keys():
                     fig = pylab.figure()
                     f = fig.add_subplot(111)
-                    f.set_xlabel(str(key))
-                    f.set_ylabel(map_feature_name)
+                    f.set_xlabel(str(key).replace('_',' '))
+                    f.set_ylabel(map_feature_name.replace('_',' '))
                     try:
                         #correlation = numpy.corrcoef(raster_plots_hc[key][0],raster_plots_hc[key][1])[0,1]
                         import scipy.stats
@@ -856,8 +874,8 @@ class SurroundModulationPlotting():
             for key in raster_plots_lc.keys():
                     fig = pylab.figure()
                     f = fig.add_subplot(111)
-                    f.set_xlabel(str(key))
-                    f.set_ylabel(map_feature_name)
+                    f.set_xlabel(str(key).replace('_',' '))
+                    f.set_ylabel(map_feature_name.replace('_',' '))
                     m,b = numpy.polyfit(raster_plots_lc[key][0],raster_plots_lc[key][1],1)
                     try:
                         #correlation = numpy.corrcoef(raster_plots_lc[key][0],raster_plots_lc[key][1])[0,1]

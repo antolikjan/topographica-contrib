@@ -332,7 +332,7 @@ def analyse_push_pull_connectivity():
     _analyse_push_pull_connectivity('V1SimpleInh','V1SimpleInhToInh')
     #_analyse_push_pull_connectivity('V1Complex','LateralExcitatory')
 
-def _analyse_push_pull_connectivity(sheet_name,proj_name):
+def _analyse_push_pull_connectivity1(sheet_name,proj_name):
     """
     It assumes orientation preference was already measured.
     """
@@ -394,6 +394,50 @@ def _analyse_push_pull_connectivity(sheet_name,proj_name):
     from param import normalize_path
     pylab.savefig(normalize_path('PPconnectivity: ' + proj_name + str(topo.sim.time()) + '.png'));
 
+def _analyse_push_pull_connectivity(sheet_name,proj_name):
+    or_bins = numpy.linspace(0,numpy.pi,31)
+    phase_bins = numpy.linspace(0,numpy.pi*2,31)
+    
+    projection = topo.sim[sheet_name].projections()[proj_name]
+    or_pref = topo.sim[projection.src.name].sheet_views['OrientationPreference'].view()[0]*numpy.pi
+    phase_pref = topo.sim[projection.src.name].sheet_views['PhasePreference'].view()[0]*numpy.pi*2
+    or_pref_target = topo.sim[projection.dest.name].sheet_views['OrientationPreference'].view()[0]*numpy.pi
+    phase_pref_target = topo.sim[projection.dest.name].sheet_views['PhasePreference'].view()[0]*2*numpy.pi
+    
+    phase_connection_strength = numpy.zeros((30,1))
+    orientation_connection_strength = numpy.zeros((30,1))
+    
+    for (i,cf) in enumerate(projection.cfs.flatten()):
+        this_or = or_pref_target.flatten()[i]
+        this_phase = phase_pref_target.flatten()[i]
+        ors = cf.input_sheet_slice.submatrix(or_pref).flatten()
+        phases = cf.input_sheet_slice.submatrix(phase_pref).flatten()
+        weights = numpy.multiply(cf.weights,cf.mask).flatten()
+        
+        for j,k in enumerate(numpy.digitize(circular_dist(ors,this_or,numpy.pi),or_bins)):
+            orientation_connection_strength[k-1] += weights[j]
+        for j,k in enumerate(numpy.digitize(circular_dist(phases,this_phase,2*numpy.pi),phase_bins)):
+            phase_connection_strength[k-1] += weights[j]
+        
+    import pylab
+    pylab.figure()
+    pylab.subplot(2,1,1)
+    pylab.hold('on')
+    pylab.plot(numpy.linspace(0,numpy.pi,30,endpoint=False)+numpy.pi/60,orientation_connection_strength,'k',linewidth=2.0)
+    pylab.plot(numpy.linspace(0,numpy.pi,30,endpoint=False)+numpy.pi/60,orientation_connection_strength,'ko')
+    pylab.title(proj_name,fontsize=20)
+    pylab.autoscale(tight=True)
+    pylab.subplot(2,1,2)
+    pylab.hold('on')
+    pylab.plot(numpy.linspace(0,numpy.pi*2,30,endpoint=False)+2*numpy.pi/60,phase_connection_strength,'k',linewidth=2.0)
+    pylab.plot(numpy.linspace(0,numpy.pi*2,30,endpoint=False)+2*numpy.pi/60,phase_connection_strength,'ko')
+    pylab.autoscale(tight=True)
+    
+    from param import normalize_path
+    pylab.savefig(normalize_path('PPconnectivity: ' + proj_name + str(topo.sim.time()) + '.png'));
+    
+        
+        
 
 import matplotlib.gridspec as gridspec
 import pylab
