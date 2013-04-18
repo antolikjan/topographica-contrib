@@ -116,7 +116,7 @@ class SurroundModulationPlotting():
         #pickle.dump(lhi,f)
         #f.close()
                 
-        f = open(prefix+'lhi0.9.pickle','rb')            
+        f = open(prefix+'lhi6.0.pickle','rb')            
         self.lhi = pickle.load(f)
         
         raster_plots_lc,raster_plots_hc = self.plot_map_feature_to_surround_modulation_feature_correlations(self.lhi,"Local Homogeneity Index")
@@ -796,8 +796,8 @@ class SurroundModulationPlotting():
         
         ax = pylab.subplot(gs[2,0])
         pylab.scatter(self.lhi.ravel(),self.MR.ravel()*2,s=3, facecolor = 'r',lw = 0)
-        xx,z = running_average(self.lhi.ravel(),self.MR.ravel()*2)
-        pylab.plot(xx,z,'k',lw=3.0)
+        #xx,z = running_average(self.lhi.ravel(),self.MR.ravel()*2)
+        #pylab.plot(xx,z,'k',lw=3.0)
         disable_top_right_axis(ax)
         pylab.xlabel('Local homogeneity index', fontsize=20)
         pylab.ylabel('Modulation ratio', fontsize=20)
@@ -809,8 +809,8 @@ class SurroundModulationPlotting():
         
         ax = pylab.subplot(gs[2,1])
         pylab.scatter(self.lhi.ravel(),self.OS.ravel(),s=3, facecolor = 'r',lw = 0)
-        xx,z = running_average(self.lhi.ravel(),self.OS.ravel())
-        pylab.plot(xx,z,'k',lw=3.0)           
+        #xx,z = running_average(self.lhi.ravel(),self.OS.ravel())
+        #pylab.plot(xx,z,'k',lw=3.0)           
         disable_top_right_axis(ax)
         ax.xaxis.set_major_locator(MaxNLocator(4))
         ax.yaxis.set_major_locator(MaxNLocator(4))

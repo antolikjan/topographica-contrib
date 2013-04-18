@@ -62,7 +62,6 @@ class SimpleHomeoLinear(TransferFnWithState):
                 self.t = ones(x.shape, x.dtype.char) * self.t_init
             
             self.y_avg = ones(x.shape, x.dtype.char) * self.mu
-        print type(x)
         x_orig = x.copy()
         x -= self.t
         clip_lower(x, 0)
@@ -320,12 +319,10 @@ off_weights = topo.pattern.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 topo.sim.connect('FakeRetina','LGNOn',delay=0.05,
-                 connection_type=OneToOneProjection,strength=7.0,
-                 nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
+                 connection_type=OneToOneProjection,strength=7.0,name='Afferent')
     
 topo.sim.connect('FakeRetina','LGNOff',delay = 0.05,
-                 connection_type=OneToOneProjection,strength=7.0,
-                 nominal_bounds=BoundingBox(radius=0.375),name='Afferent')
+                 connection_type=OneToOneProjection,strength=7.0,name='Afferent')
 
 
 g1 = Gaussian(aspect_ratio=1.0,scale=1.0,size=numbergen.UniformRandom(lbound=0.8,ubound=0.8,seed=56))
