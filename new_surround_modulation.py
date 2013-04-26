@@ -104,13 +104,14 @@ class SurroundModulationPlotting():
         for coords in self.data_dict.keys():    
             if self.lhi[coords] < 0.25:
                pinwheels.append(coords) 
-            if self.lhi[coords] > 0.75:
+            if self.lhi[coords] > 0.8:
                centers.append(coords) 
-        print centers
-        print pinwheels
         self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
         self.plot_average_oct(keys=centers,independent=True,string="domains")
-                
+        self.plot_fullfield_optimal_or_pref_correlation(pinwheels)
+        self.plot_fullfield_optimal_or_pref_correlation(centers)
+        
+        
         #for coords in self.data_dict.keys():
         #    xindex,yindex = coords
         #    self.plot_size_tunning(xindex,yindex)
@@ -166,30 +167,18 @@ class SurroundModulationPlotting():
                         measurment[curve_label]["measures"]["or_suppression"]=(cont_or_resp-pref_or_resp)/peak_or_response
                     else: 
                         measurment[curve_label]["measures"]["or_suppression"]=0.0
-
-                    if xindex == 57 and yindex == 63:
-                        print 'AAAAA' 
-                        print orr
-                        print orr_ort
-                        print curve.keys()
-                        print cont_or_resp
-                        print pref_or_resp
-                        print peak_or_response
-                        print (cont_or_resp-pref_or_resp)/peak_or_response
-                        print curve_label
-                        print measurment[curve_label]["measures"]["or_suppression"]
-                        print self.data_dict[(xindex,yindex)]["OCT"]['Contrastsurround = 20%']["measures"]["or_suppression"]
-                        
-                        x_values = sorted(curve.keys())
-                        y_values = [curve[o].view()[0][xindex][yindex] for o in x_values]
-                        pylab.figure()
-                        pylab.hold('on')
-                        pylab.plot(x_values,y_values,'ro')
-                        pylab.plot(x_values,y_values,'r')
-                        pylab.plot(ors,ar,'bo')
-                        pylab.plot(ors,ar,'b')
-                        
-                        #release_fig("OOOOO")
+    
+    def plot_fullfield_optimal_or_pref_correlation(self,coords):
+        optimal = []
+        full = []
+        for (xindex,yindex) in coords:
+            measurment = self.data_dict[(xindex,yindex)]["OCT"]
+            optimal.append(measurment["ORTC"]["info"]["pref_or"])
+            full.append(self.OR[(xindex,yindex)]*numpy.pi)
+        pylab.figure()
+        pylab.plot(optimal,full,'bo')
+        pylab.xlabel('optimal')
+        pylab.ylabel('full')
     
     def recalculate_size_tuning_measures(self):
         for (xindex,yindex) in self.data_dict.keys():
