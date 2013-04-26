@@ -215,8 +215,8 @@ topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,
 #Layer 2/3
 topo.sim.connect('V1Simple','V1Complex',delay=0.025,
                  connection_type=CFProjection,strength=__main__.__dict__.get('StoCStr',2.5),name='V1SimpleAfferent',
-                 weights_generator=Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('StoCSize',0.05)),
-                 nominal_bounds_template=BoundingBox(radius=2*__main__.__dict__.get('StoCSize',0.05)),learning_rate=0.0)
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=0.05),
+                 nominal_bounds_template=BoundingBox(radius=0.075),learning_rate=0.0)
                 
 
 topo.sim.connect('V1Complex','V1Simple',delay=0.025,
@@ -241,7 +241,7 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.025,name='LateralExcitatory',
 topo.sim.connect('V1Complex','V1Complex',delay=0.025,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-__main__.__dict__.get('CCStrInh',1.5),
                  weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
-                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.17),
+                   generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
                                 topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.4),
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=

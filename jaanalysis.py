@@ -205,7 +205,7 @@ def push_pull_analysis_function():
     # Plot all projections for all measured_sheets
     for s in measured_sheets:
         for p in s.projections().values():
-            save_plotgroup("Projection",projection=p,density=50.0)
+            save_plotgroup("Projection",projection=p,density=3.0)
 
     print 'Starting push pull analysis'	
     analyse_push_pull_connectivity()

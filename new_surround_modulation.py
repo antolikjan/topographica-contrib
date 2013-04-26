@@ -26,7 +26,7 @@ rc('legend',fontsize=20)
 rc('legend',labelspacing=0.25)
 
 prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/'
-prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test1'
+prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test2'
 
 
 #prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew4EEBig=9NEWJoined/'
@@ -94,11 +94,28 @@ class SurroundModulationPlotting():
         self.recalculate_orientation_contrast_supression()
         self.recalculate_size_tuning_measures()
         
-        for coords in self.data_dict.keys():
-            xindex,yindex = coords
-            self.plot_size_tunning(xindex,yindex)
-            self.plot_orientation_contrast_tuning(xindex,yindex)
+        print "Number of measured neurons: " , len(self.data_dict.keys())
         
+        f = open(prefix+'lhi2.0.pickle','rb')            
+        self.lhi = pickle.load(f)
+        # determine pinwheels and domain centers
+        pinwheels = []
+        centers = []
+        for coords in self.data_dict.keys():    
+            if self.lhi[coords] < 0.25:
+               pinwheels.append(coords) 
+            if self.lhi[coords] > 0.75:
+               centers.append(coords) 
+        print centers
+        print pinwheels
+        self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
+        self.plot_average_oct(keys=centers,independent=True,string="domains")
+                
+        #for coords in self.data_dict.keys():
+        #    xindex,yindex = coords
+        #    self.plot_size_tunning(xindex,yindex)
+        #    self.plot_orientation_contrast_tuning(xindex,yindex,str(self.lhi[xindex,yindex]))
+        return
         self.plot_histograms_of_measures()
         #print('1')
         self.plot_average_size_tuning_curve()
@@ -116,9 +133,6 @@ class SurroundModulationPlotting():
         #pickle.dump(lhi,f)
         #f.close()
                 
-        f = open(prefix+'lhi6.0.pickle','rb')            
-        self.lhi = pickle.load(f)
-        
         raster_plots_lc,raster_plots_hc = self.plot_map_feature_to_surround_modulation_feature_correlations(self.lhi,"Local Homogeneity Index")
         self.correlations_figure(raster_plots_lc)
         self.plot_map_feature_to_surround_modulation_feature_correlations(self.OS,"OrientationSelectivity")
@@ -133,7 +147,7 @@ class SurroundModulationPlotting():
                     z = measurment['ORTC']['data']
                     ar = []
                     ors = []
-                    for o in z.keys():
+                    for o in sorted(z.keys()):
                         ar.append(z[o].view()[0][xindex][yindex])
                         ors.append(o)
                     peak_or_response = max(ar)
@@ -147,13 +161,35 @@ class SurroundModulationPlotting():
                     
                     pref_or_resp=curve[orr].view()[0][xindex][yindex]
                     cont_or_resp=curve[orr_ort].view()[0][xindex][yindex]
-            
+                    
                     if peak_or_response != 0:
                         measurment[curve_label]["measures"]["or_suppression"]=(cont_or_resp-pref_or_resp)/peak_or_response
                     else: 
                         measurment[curve_label]["measures"]["or_suppression"]=0.0
-   
-    
+
+                    if xindex == 57 and yindex == 63:
+                        print 'AAAAA' 
+                        print orr
+                        print orr_ort
+                        print curve.keys()
+                        print cont_or_resp
+                        print pref_or_resp
+                        print peak_or_response
+                        print (cont_or_resp-pref_or_resp)/peak_or_response
+                        print curve_label
+                        print measurment[curve_label]["measures"]["or_suppression"]
+                        print self.data_dict[(xindex,yindex)]["OCT"]['Contrastsurround = 20%']["measures"]["or_suppression"]
+                        
+                        x_values = sorted(curve.keys())
+                        y_values = [curve[o].view()[0][xindex][yindex] for o in x_values]
+                        pylab.figure()
+                        pylab.hold('on')
+                        pylab.plot(x_values,y_values,'ro')
+                        pylab.plot(x_values,y_values,'r')
+                        pylab.plot(ors,ar,'bo')
+                        pylab.plot(ors,ar,'b')
+                        
+                        #release_fig("OOOOO")
     
     def recalculate_size_tuning_measures(self):
         for (xindex,yindex) in self.data_dict.keys():
@@ -244,7 +280,7 @@ class SurroundModulationPlotting():
         return numpy.abs(c)/n
         
     
-    def plot_orientation_contrast_tuning(self, xindex, yindex,independent=True):
+    def plot_orientation_contrast_tuning(self, xindex, yindex,string,independent=True):
             if independent:
                fig = pylab.figure()
         
@@ -257,7 +293,7 @@ class SurroundModulationPlotting():
             m = 0
             
             for curve_label in measurment.keys():
-                if curve_label != 'Contrastsurround = 100%':
+                #if curve_label != 'Contrastsurround = 100%':
                     curve =  measurment[curve_label]["data"]
                     
                     x_values = sorted(curve.keys())
@@ -274,7 +310,7 @@ class SurroundModulationPlotting():
                         
                         ssi = self.calculate_octc_selectivity(2*x_values,numpy.max(z)-y_values)
                         self.data_dict[(xindex,yindex)]["OCT"][curve_label]["measures"]["SSI"]=ssi
-                        self.data_dict[(xindex,yindex)]["OCT"]['Contrastsurround = 100%']["measures"]["SSI"]=ssi
+                        #self.data_dict[(xindex,yindex)]["OCT"]['Contrastsurround = 100%']["measures"]["SSI"]=ssi
                         
                     
                     
@@ -320,15 +356,16 @@ class SurroundModulationPlotting():
             ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
             ax.set_xticks([-numpy.pi/2,0,numpy.pi/2.0])
             
-	    ax.set_yticklabels(ax.get_yticks(), fontProperties)
+            
             #ax.set_xticklabels([r'-$\frac{\mathrm{\mathsf{\pi}}{2}$',r'0',r'$\frac{\mathrm{\mathsf{\pi}}{2}$'], fontProperties)            
             # get ceil at first decimal point
             m = numpy.ceil(m)
             ax.set_yticks([0.1,m/2,m])
-            ax.set_ylim(0.1,m)
-
+            ax.set_yticklabels(ax.get_yticks(), fontProperties)
+            #ax.set_ylim(0.1,m)
+            pylab.show()
             if independent:
-                release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "]")
+                release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "] " + str(self.data_dict[(xindex,yindex)]["OCT"]['Contrastsurround = 20%']["measures"]["or_suppression"]) + " " + string)
             
 
     def plot_average_size_tuning_curve(self,independent=True):
@@ -397,14 +434,18 @@ class SurroundModulationPlotting():
         if independent:
             release_fig("AverageSTC")
    
-    def plot_average_oct(self,independent=True):
+    def plot_average_oct(self,keys=None,independent=True,string=""):
         if independent:
             fig = pylab.figure()
         
         average_curves={}        
         sem_curves={}        
-        curves={}        
-        for k in self.data_dict.keys():
+        curves={}    
+        
+        if keys == None:
+           keys = self.data_dict.keys()
+            
+        for k in keys:
           xindex, yindex = k          
           curve =  self.data_dict[k]["OCT"]["ORTC"]["data"]
           x_values = sorted(curve.keys())
@@ -478,7 +519,7 @@ class SurroundModulationPlotting():
 	pylab.gca().set_yticklabels(pylab.gca().get_yticks(), fontProperties)
 
         if independent:
-            release_fig("AverageOCTC") 
+            release_fig("AverageOCTC" + string) 
 
     def plot_histograms_of_measures(self):
         histograms_lc = {} 
@@ -659,29 +700,29 @@ class SurroundModulationPlotting():
         pylab.ylabel('Normalized response', fontsize=20)
         
         ax = pylab.subplot(gs[22:32,1:11])
-        self.plot_orientation_contrast_tuning(picked_stcs[0][0], picked_stcs[0][1],independent=False)
+        self.plot_orientation_contrast_tuning(picked_stcs[0][0], picked_stcs[0][1],'',independent=False)
         remove_x_tick_labels()
         pylab.ylabel('Response', fontsize=20)
         ax = pylab.subplot(gs[22:32,13:23])
-        self.plot_orientation_contrast_tuning(picked_stcs[1][0], picked_stcs[1][1],independent=False)
+        self.plot_orientation_contrast_tuning(picked_stcs[1][0], picked_stcs[1][1],'',independent=False)
         disable_left_axis(pylab.gca())
         remove_x_tick_labels()
         remove_y_tick_labels()
         ax = pylab.subplot(gs[22:32,25:35])
-        self.plot_orientation_contrast_tuning(picked_stcs[2][0], picked_stcs[2][1],independent=False)
+        self.plot_orientation_contrast_tuning(picked_stcs[2][0], picked_stcs[2][1],'',independent=False)
         disable_left_axis(pylab.gca())
         remove_x_tick_labels()
         remove_y_tick_labels()
         
         ax = pylab.subplot(gs[34:44,1:11])
-        self.plot_orientation_contrast_tuning(picked_stcs[3][0], picked_stcs[3][1],independent=False)
+        self.plot_orientation_contrast_tuning(picked_stcs[3][0], picked_stcs[3][1],'',independent=False)
         pylab.ylabel('Response', fontsize=20)
         ax = pylab.subplot(gs[34:44,13:23])
-        self.plot_orientation_contrast_tuning(picked_stcs[4][0], picked_stcs[4][1],independent=False)
+        self.plot_orientation_contrast_tuning(picked_stcs[4][0], picked_stcs[4][1],'',independent=False)
         disable_left_axis(pylab.gca())
         remove_y_tick_labels()
         ax = pylab.subplot(gs[34:44,25:35])
-        self.plot_orientation_contrast_tuning(picked_stcs[5][0], picked_stcs[5][1],independent=False)
+        self.plot_orientation_contrast_tuning(picked_stcs[5][0], picked_stcs[5][1],'',independent=False)
         disable_left_axis(pylab.gca())
         remove_y_tick_labels()
         
