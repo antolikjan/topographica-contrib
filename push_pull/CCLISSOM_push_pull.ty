@@ -22,7 +22,8 @@ from topo.transferfn import DivisiveNormalizeL1, HomeostaticMaxEnt, Sigmoid ,Hys
 from topo import numbergen
 from topo.pattern import Gaussian
 from topo.base.functionfamily import CoordinateMapperFn
-from contrib.CCLISSOM_push_pull_extra import SimpleHomeoLinear, Expander, Jitterer, randomize_V1Simple_relative_LGN_strength, CFPLF_KeyserRule, domains_stability_test
+from contrib.push_pull.CCLISSOM_push_pull_extra import  CFPLF_KeyserRule, domains_stability_test
+from contrib.jacommands import SimpleHomeoLinear, Expander, Jitterer, randomize_V1Simple_relative_LGN_strength
 from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
 topo.sim.name = "cclissom_push_pull"
 #### Set up retinal inputs
