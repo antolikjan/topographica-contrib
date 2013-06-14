@@ -43,9 +43,7 @@ class CFPLF_KeyserRule(CFPLearningFn):
             p = topo.sim[self.sheet].projections()[s]
             inhibition += abs(p.activity)
 
-        
         for cf,i in iterator():
-            
             # Anti-hebbian part
             if output_activity.flat[i] != 0:
                 cf.weights -= single_connection_learning_rate * output_activity.flat[i] * cf.get_input_matrix(input_activity)
@@ -54,8 +52,9 @@ class CFPLF_KeyserRule(CFPLearningFn):
             if inhibition.flat[i] != 0:
                 cf.weights += single_connection_learning_rate * inhibition.flat[i] * cf.get_input_matrix(input_activity)
             
+            # make sure weights outside of mask are not changed
             cf.weights *= numpy.multiply((cf.weights>0),cf.mask)
-
+        
 
 def circular_dist(a,b,period):
     """
@@ -276,5 +275,77 @@ def domains_stability_test(parameters,parameter_values,sheets,sheets_to_record,r
     mp.go(initial_run=True)
 
     
+
+def check_RF_corrleation_vs_connection_weights_correlation():
+    _check_RF_corrleation_vs_connection_weights_correlation(topo.sim["V1Simple"].projections()["LGNOnAfferent"],topo.sim["V1Simple"].projections()["LGNOnAfferent"],topo.sim["V1Simple"].projections()["L4EtoE"],topo.sim["LGNOn"],topo.sim["V1Simple"],topo.sim["V1Simple"])
+    print "1"
+    _check_RF_corrleation_vs_connection_weights_correlation(topo.sim["V1Simple"].projections()["LGNOnAfferent"],topo.sim["V1SimpleInh"].projections()["LGNOnAfferentInh"],topo.sim["V1SimpleInh"].projections()["L4EtoI"],topo.sim["LGNOn"],topo.sim["V1Simple"],topo.sim["V1SimpleInh"])
+    print "2"
+    _check_RF_corrleation_vs_connection_weights_correlation(topo.sim["V1SimpleInh"].projections()["LGNOnAfferentInh"],topo.sim["V1Simple"].projections()["LGNOnAfferent"],topo.sim["V1Simple"].projections()["L4ItoE"],topo.sim["LGNOn"],topo.sim["V1SimpleInh"],topo.sim["V1Simple"])
+    print "3"
+    _check_RF_corrleation_vs_connection_weights_correlation(topo.sim["V1SimpleInh"].projections()["LGNOnAfferentInh"],topo.sim["V1SimpleInh"].projections()["LGNOnAfferentInh"],topo.sim["V1SimpleInh"].projections()["L4ItoI"],topo.sim["LGNOn"],topo.sim["V1SimpleInh"],topo.sim["V1SimpleInh"])
+    print "4"
+    pylab.show()
+
+def _check_RF_corrleation_vs_connection_weights_correlation(source_sheet_afferent_projection,target_sheet_afferent_projection,projection,afferent_sheet,source_sheet,target_sheet):
+    """
+    It shows the relationship between the afferent connection correlations and the weight correlation in the given projection
+    for the same neurons.
+    """
+    assert projection.cfs.shape == target_sheet_afferent_projection.cfs.shape
     
+    
+    corrs = []
+    w = []
+    
+    def overlap(slice1,slice2):
+        indexes1 = slice1.tolist()
+        indexes2 = slice2.tolist()
+        
+        o = [max(indexes1[0],indexes2[0]),min(indexes1[1],indexes2[1]),max(indexes1[2],indexes2[2]),min(indexes1[3],indexes2[3])]  
+        
+        # Make sure there is overlap and that it is at least 4x4 in size
+        if (o[0] < o[1]-4) and (o[2] < o[3]-4):
+          return o  
+        else:
+          return None
+    
+    for i,cf1 in enumerate(target_sheet_afferent_projection.cfs.flatten()):
+        z = projection.cfs.flatten()[i]
+        indexes = z.input_sheet_slice.tolist()
+        full_cf = numpy.zeros(source_sheet.activity.shape)
+        full_cf[indexes[0]:indexes[1],indexes[2]:indexes[3]] = z.weights
+        full_cf = full_cf.flatten()
+
+        for j,cf2 in enumerate(source_sheet_afferent_projection.cfs.flatten()):
+            if numpy.random.rand() < 0.01:
+                indexes1 = cf1.input_sheet_slice.tolist()
+                indexes2 = cf2.input_sheet_slice.tolist()
+                
+                o = overlap(cf1.input_sheet_slice,cf2.input_sheet_slice)
+                if o != None:
+                    
+                    full_cf1 = numpy.zeros(afferent_sheet.activity.shape)
+                    full_cf1[indexes1[0]:indexes1[1],indexes1[2]:indexes1[3]] =cf1.weights 
+                    full_cf1 = full_cf1[o[0]:o[1],o[2]:o[3]]
+                    
+                    
+                    full_cf2 = numpy.zeros(afferent_sheet.activity.shape)
+                    full_cf2[indexes2[0]:indexes2[1],indexes2[2]:indexes2[3]] =cf2.weights 
+                    full_cf2 = full_cf2[o[0]:o[1],o[2]:o[3]]
+                    
+                    
+                    
+                    corrs.append(numpy.corrcoef(full_cf1.flatten(),full_cf2.flatten())[0][1])
+                else:
+                    corrs.append(0)
+                w.append(full_cf[j])
+                
+            
+    pylab.figure()
+    pylab.plot(corrs,w,'ro')
+    pylab.xlabel('RF correlations')
+    pylab.ylabel('Weight strength')
+
+
     
