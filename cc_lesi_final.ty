@@ -35,7 +35,7 @@ from topo import numbergen
 from topo.pattern import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
 from topo.base.functionfamily import CoordinateMapperFn
-from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Jitterer, AddGC, SimpleHomeoLinear, Expander, LogisticLoss
+from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Jitterer, AddGC, SimpleHomeoLinear, Expander
 from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
 
 
@@ -65,7 +65,7 @@ elif dataset=="Natural":
                                 for f in image_filenames]
                         
     elif locals().get('imageset',"Shouval") == 'Konig':
-        image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
+        image_filenames=["/exports/work/inf_ndtc/s0570140/NEW_ENVIRONMENT/topographica/images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
         print image_filenames
         inputs=[input_type(filename=f,
                         size=10.0,  #size_normalization='original',(size=10.0)
@@ -86,7 +86,7 @@ elif dataset=="Natural":
 
 disk_scale=locals().get('diskscale',0.35)
 reg=locals().get('Region',1.0)
-
+print reg
 ring = topo.pattern.Composite(bounds=BoundingBox(radius=2*reg),operator=numpy.add,x=numbergen.UniformRandom(lbound=-reg,ubound=reg,seed=13),
                                     y=numbergen.UniformRandom(lbound=-reg,ubound=reg,seed=26),
                                     generators=[topo.pattern.Ring(size=1.0, aspect_ratio=1.0, scale=locals().get('RingScale',0.25),thickness=locals().get('Thickness',0.01),

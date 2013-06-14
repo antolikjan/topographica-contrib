@@ -25,9 +25,11 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/'
-prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test2'
+prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_SPACE=0.0_NUM_PHASE=32_LC=20/'
+prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_SPACE=0.0_NUM_PHASE=32_LC=20/out'
 
+#prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/'
+#prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test3'
 
 #prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew4EEBig=9NEWJoined/'
 #prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew4EEBig=9NEWJoined/out'
@@ -104,13 +106,16 @@ class SurroundModulationPlotting():
         for coords in self.data_dict.keys():    
             if self.lhi[coords] < 0.25:
                pinwheels.append(coords) 
-            if self.lhi[coords] > 0.8:
+            if self.lhi[coords] > 0.80:
                centers.append(coords) 
+               
         self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
         self.plot_average_oct(keys=centers,independent=True,string="domains")
         self.plot_fullfield_optimal_or_pref_correlation(pinwheels)
         self.plot_fullfield_optimal_or_pref_correlation(centers)
         
+        print centers
+        print pinwheels
         
         #for coords in self.data_dict.keys():
         #    xindex,yindex = coords

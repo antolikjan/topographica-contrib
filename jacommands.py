@@ -26,14 +26,10 @@ from topo.command.pylabplot import cyclic_tuning_curve, matrixplot
 from topo.command.analysis import save_plotgroup
 from param import normalize_path
 from topo.command.pylabplot import plot_tracked_attributes
-from topo.base.functionfamily import CoordinateMapperFn
+from topo.base.functionfamily import CoordinateMapperFn,TransferFn
 from topo.plotting.bitmap import MontageBitmap
 from topo.base.patterngenerator import PatternGenerator, Constant 
 from topo.transferfn import  Sigmoid
-
-
-
-
 
 
 import matplotlib 
@@ -546,14 +542,12 @@ def save_movie():
     movie.save()
     
 def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
-    print 'Start'
     lgn_on_proj = topo.sim[sheet_name].in_connections[0]
     lgn_off_proj = topo.sim[sheet_name].in_connections[1]
     
     rand =numbergen.UniformRandom(seed=513)
     
     rows, cols = lgn_on_proj.cfs.shape
-    print 'For'
     for r in xrange(rows):
         for c in xrange(cols):
             cf_on = lgn_on_proj.cfs[r, c]
@@ -574,7 +568,7 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
             
             #cf_on.weights*=a 
             #cf_off.weights*=(1-a)
-    print 'End'            
+            
 
 import topo.transferfn
 ActivityHysteresis = topo.transferfn.Hysteresis
@@ -741,6 +735,12 @@ class Expander(PatternGenerator):
         When pattern position should be reset, usually to the value of a dynamic parameter.
 
         The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
+        
+    visual_field_size = param.Number(default=10e8, bounds=(0.0, None), doc="""
+	Sometimes we want to expand stimuli from far positions, and thus the stimulus would not 
+	intersect with our visual field. This allows us to 'skip' the simulation time when the 
+	stimulus is not in the visual_field.
+        """)
     
     last_time = 0.0
 
@@ -748,6 +748,14 @@ class Expander(PatternGenerator):
     def __init__(self, **params):
         super(Expander, self).__init__(**params)
         self.size = params.get('size', self.size)
+        
+        x = params.get('x', self.x)
+        y = params.get('y', self.y)
+        
+        # make sure that the stimulus starts with size that intersects with our visual_field_size
+        if (numpy.sqrt(x*x + y*y) > numpy.sqrt(2)*self.visual_field_size):
+    	    self.size = (numpy.sqrt(x*x + y*y) - numpy.sqrt(2)*self.visual_field_size)
+        
         self.index = 0
         self.last_time=0.0
         
@@ -768,12 +776,17 @@ class Expander(PatternGenerator):
                 self.last_time += self.reset_period
             # time to reset the parameter
             (self.x, self.y) = (generator.x, generator.y)
+            
             if isinstance(generator, Selector):
                 self.index = generator.index
+
             generator.force_new_dynamic_value('x')
             generator.force_new_dynamic_value('y')
+            
+            
+            if (numpy.sqrt(self.x*self.x + self.y*self.y) > self.visual_field_size):
+    		self.size = 2*(numpy.sqrt(self.x*self.x + self.y*self.y) - self.visual_field_size)
 
-        (a, b) = (generator.x, generator.y)   
         # compute how much time elapsed from the last reset
         t = float(topo.sim.time()) - self.last_time
 
@@ -781,8 +794,13 @@ class Expander(PatternGenerator):
         ## generator and for this one.  (leads to redundant
         ## calculations in current lissom_oo_or usage, but will lead
         ## to problems/limitations in the future).
-        return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x, y=self.y,
+        #return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=-2.4, y=2.47,size=6.0,index=self.index)
+        
+        return generator(xdensity=xdensity, ydensity=ydensity, bounds=self.bounds, x=self.x, y=self.y,
              size=self.size + t * self.speed,index=self.index)
+
+
+
 
 
 class Jitterer(PatternGenerator):
@@ -805,6 +823,9 @@ class Jitterer(PatternGenerator):
         When pattern position should be reset, usually to the value of a dynamic parameter.
 
         The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
+
+    seed = param.Number(default=1023, bounds=(0.0, None), doc="""Seed of the jitterer""")
+
     
     last_time = 0.0
 
@@ -812,7 +833,9 @@ class Jitterer(PatternGenerator):
     def __init__(self, **params):
         super(Jitterer, self).__init__(**params)
         self.orientation = params.get('orientation', self.orientation)
-        self.r =numbergen.UniformRandom(seed=1023)
+        a = self.orientation # Force generation of first orientation value, I don't know why but on eddie it appears as if the self.orientation still seems to be
+			     # un-itialized at this point and this seems to force for the first random number for it to be drawn  	
+	self.r =numbergen.UniformRandom(seed=1023)
         self.index = 0
         
     def __call__(self, **params):
@@ -823,7 +846,7 @@ class Jitterer(PatternGenerator):
         bounds = params.get('bounds', self.bounds)
 
         if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <= 0.05)):
-            if ((float(topo.sim.time()) <= (self.last_time + self.reset_period + 1.0)) and (float(topo.sim.time()) >= 0.05))    :
+            if ((float(topo.sim.time()) <= (self.last_time + self.reset_period + 1.0)) and (float(topo.sim.time()) >= 0.05)):
                 return Null()(xdensity=xdensity, ydensity=ydensity, bounds=bounds)
         
             self.last_time += self.reset_period
@@ -835,8 +858,12 @@ class Jitterer(PatternGenerator):
             generator.force_new_dynamic_value('y')
             generator.force_new_dynamic_value('scale')
             discards = self.orientation
+	    #print "V"
+	    #print discards	
             
         (a, b, c) = (generator.x, generator.y, generator.scale)   
+	#print float(topo.sim.time())
+	#print self.inspect_value("orientation")
         return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x + self.jitter_magnitude * self.r(), y=self.y + self.jitter_magnitude * self.r(), orientation=self.inspect_value("orientation"), index=self.inspect_value("index"))
 
 
@@ -900,10 +927,10 @@ def measure_ot(lat_exc, lat_inh, e, t):
     
     filename = "Exc=" + str(lat_exc) + "_Inh=" + str(lat_inh) + "_E=" + str(e) + "_T=" + str(t) 
      
-    topo.command.analysis.measure_or_tuning_fullfield(display=True, num_phase=4, num_orientation=80, frequencies=[2.4],
+    topo.commands.analysis.measure_or_tuning_fullfield(display=True, num_phase=4, num_orientation=80, frequencies=[2.4],
                                curve_parameters=[{"contrast":1}, {"contrast":5}, {"contrast":10}, {"contrast":50}, {"contrast":90}])
     
-    topo.command.pylabplot.cyclic_tuning_curve(suffix="GC_with_LGNGC_HR", filename=filename, sheet=topo.sim["V1"], coords=[(0, 0)], x_axis="orientation")
+    topo.commands.pylabplot.cyclic_tuning_curve(suffix="GC_with_LGNGC_HR", filename=filename, sheet=topo.sim["V1"], coords=[(0, 0)], x_axis="orientation")
     
     
 
@@ -1033,3 +1060,64 @@ def weighted_local_std(x,y,s):
 	z.append(numpy.sqrt(numpy.sum(numpy.power(numpy.multiply(y-av,b),2))/numpy.sum(b)))
     return z
 
+
+
+def LateralOrientationAnnisotropy():
+
+    pylab.figure()
+    orr = topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0]
+    
+    (s,z) = numpy.shape(orr)
+    
+
+
+
+    w = numpy.zeros((s,z))
+    for x in xrange((s/3)+1,2*(s/3)-1):
+	for y in xrange((s/3)+1,2*(s/3)-1):
+	    if (orr[x,y] < 0.05) or (orr[x,y] > 0.95):
+		b = topo.sim["V1ComplexInh"].projections()["LongEI"].cfs[x,y].weights.copy()
+		b[x-int(s/8):x+int(s/8),y-int(s/8):y+int(s/8)] = 0
+	        w = w + b
+	        
+    
+    w1 = numpy.zeros((s,z))
+    orr = topo.sim["V1Complex"].sheet_views["OrientationPreference"].view()[0]    
+    for x in xrange((s/3)+1,2*(s/3)-1):
+	for y in xrange((s/3)+1,2*(s/3)-1):
+	    if (orr[x,y] > 0.45) and (orr[x,y] < 0.55):
+		b = topo.sim["V1ComplexInh"].projections()["LongEI"].cfs[x,y].weights.copy()
+		b[x-int(s/8):x+int(s/8),y-int(s/8):y+int(s/8)] = 0
+	        w1 = w1 + b
+
+    pylab.figure()
+    pylab.subplot(2,1,1)
+    pylab.hist(numpy.pi*numpy.array(orr.ravel()),weights=numpy.array(w.ravel()))
+    pylab.subplot(2,1,2)
+    pylab.hist(numpy.pi*numpy.array(orr.ravel()),weights=numpy.array(w1.ravel()))
+
+
+    pylab.savefig(normalize_path('hist.png'))
+
+class LogisticLoss(TransferFn):
+    """
+    Transfer function that applies Logisti Loss function
+    """
+    t_init = param.Number(default=0.0,doc="""The initial value of threshold at which output becomes non-zero..""")
+    c = param.Number(default=1.0,doc="""The log-loss coeficcient""")
+    a = param.Number(default=1.0,doc="""Scaler""")
+
+    def __init__(self,**params):
+        super(TransferFn,self).__init__(**params)
+        self.first_call = True
+    
+    def __call__(self,x):
+        if self.first_call:
+            self.first_call = False
+            self.t = ones(x.shape, x.dtype.char) * self.t_init
+
+        a=self.a*numpy.log(1+numpy.exp(self.c*(x-self.t)))
+        x*=0
+        x+=a
+               
+                                                                                                
