@@ -25,8 +25,14 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_SPACE=0.0_NUM_PHASE=32_LC=20/'
-prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_SPACE=0.0_NUM_PHASE=32_LC=20/out'
+prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_LOWCONTRAST3_A=1/'
+prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_LOWCONTRAST3_A=1/out3'
+
+#prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_SPACE=0.0_NUM_PHASE=16_LC=15/'
+#prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_SPACE=0.0_NUM_PHASE=16_LC=15/out_new'
+
+
+
 
 #prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/'
 #prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test3'
@@ -80,7 +86,7 @@ def remove_y_tick_labels():
 
 class SurroundModulationPlotting():
 
-    low_contrast=20
+    low_contrast=40
     high_contrast=100
     
     def __init__(self):
@@ -97,9 +103,15 @@ class SurroundModulationPlotting():
         self.recalculate_size_tuning_measures()
         
         print "Number of measured neurons: " , len(self.data_dict.keys())
+        if True:
+            self.lhi = compute_local_homogeneity_index(self.OR*pi,3.0)    
+            f = open(prefix+'lhi3.0.pickle','wb')            
+            pickle.dump(self.lhi,f)
+            f.close()
+        else:        
+            f = open(prefix+'lhi2.0.pickle','rb')            
+            self.lhi = pickle.load(f)
         
-        f = open(prefix+'lhi2.0.pickle','rb')            
-        self.lhi = pickle.load(f)
         # determine pinwheels and domain centers
         pinwheels = []
         centers = []
@@ -117,27 +129,22 @@ class SurroundModulationPlotting():
         print centers
         print pinwheels
         
-        #for coords in self.data_dict.keys():
-        #    xindex,yindex = coords
-        #    self.plot_size_tunning(xindex,yindex)
-        #    self.plot_orientation_contrast_tuning(xindex,yindex,str(self.lhi[xindex,yindex]))
-        return
-        self.plot_histograms_of_measures()
+        for coords in self.data_dict.keys():
+            xindex,yindex = coords
+            self.plot_size_tunning(xindex,yindex,independent=False)
+            self.plot_orientation_contrast_tuning(xindex,yindex,str(self.lhi[xindex,yindex]),independent=False)
+        #return
+        #self.plot_histograms_of_measures()
         #print('1')
-        self.plot_average_size_tuning_curve()
+        #self.plot_average_size_tuning_curve()
         #print('2')
-        self.plot_average_oct()
+        #self.plot_average_oct()
         #print('3')
         
-        self.Figure6()
-        print('4')
-        self.Figure8()
-        print('5')
-        
-        #lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
-        #f = open(prefix+'lhi2.0.pickle','wb')            
-        #pickle.dump(lhi,f)
-        #f.close()
+        #self.Figure6()
+        #print('4')
+        #self.Figure8()
+        #print('5')
                 
         raster_plots_lc,raster_plots_hc = self.plot_map_feature_to_surround_modulation_feature_correlations(self.lhi,"Local Homogeneity Index")
         self.correlations_figure(raster_plots_lc)
@@ -524,6 +531,7 @@ class SurroundModulationPlotting():
                    curve_label = "Contrast"
                 else:
                    curve_label = "Contrastsurround"
+                print self.data_dict[(xcoord,ycoord)][curve_type].keys()   
                 for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
                     if not histograms_hc.has_key(curve_type + "_" + measure_name):
                         histograms_hc[curve_type + "_" + measure_name]=[]
@@ -868,14 +876,16 @@ class SurroundModulationPlotting():
             raster_plots_hc={}
             for (xcoord,ycoord) in self.data_dict.keys():
                 for curve_type in self.data_dict[(xcoord,ycoord)].keys():
+                    print curve_type
                     if curve_type == "ST":
                        curve_label = "Contrast"
                     else:
                        curve_label = "Contrastsurround" 
                     
                     
-                    if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.low_contrast) + "%"):
+                    if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.high_contrast) + "%"):
                         for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
+                            print measure_name
                             if not raster_plots_hc.has_key(measure_name):
                                 raster_plots_hc[measure_name]=[[],[]]    
                             raster_plots_hc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"][measure_name])
@@ -883,6 +893,7 @@ class SurroundModulationPlotting():
                     
                     if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.low_contrast) + "%"):
                         for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"].keys():
+                            print measure_name
                             if not raster_plots_lc.has_key(measure_name):
                                 raster_plots_lc[measure_name]=[[],[]]    
                             raster_plots_lc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = "  + str(self.low_contrast) + "%"]["measures"][measure_name])

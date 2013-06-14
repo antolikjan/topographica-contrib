@@ -708,7 +708,6 @@ class Translator(PatternGenerator):
         ## generator and for this one.  (leads to redundant
         ## calculations in current lissom_oo_or usage, but will lead
         ## to problems/limitations in the future).
-        
         dirr = self.inspect_value("direction")
         # JAHACKALERT: I want it to move in perpendicular orientation
         # JAB: Does it do that now, or not?  Please clarify.

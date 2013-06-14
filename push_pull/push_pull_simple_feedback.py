@@ -32,7 +32,7 @@ from topo.base.patterngenerator import PatternGenerator, Constant
 from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
 from contrib.jacommands import SimpleHomeoLinear, Jitterer, Expander, randomize_V1Simple_relative_LGN_strength, Jitter
 from contrib.push_pull.CCLISSOM_push_pull_extra import CFPLF_KeyserRule
-topo.sim.name = "complex_cell_lissom"
+topo.sim.name = "push_pull_simple_feedback"
 
 
 #### Set up retinal inputs
@@ -204,13 +204,13 @@ topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,name='L4ItoE',
                  connection_type=CFProjection,strength=0.3,
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=0.12),learning_fn = CFPLF_KeyserRule("V1Simple",['L4ItoE']),
-                 learning_rate=0.5)
+                 learning_rate=1.5)
 
 topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,name='L4ItoI',
                  connection_type=CFProjection,strength=0.3,
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=0.12),learning_fn = CFPLF_KeyserRule("V1SimpleInh",['L4ItoI']),
-                 learning_rate=0.5)
+                 learning_rate=1.5)
 
 
 #Layer 2/3
