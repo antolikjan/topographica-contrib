@@ -71,7 +71,7 @@ class surround_analysis():
 
     def analyse(self,steps=[],ns=10,offset_x=0,offset_y=0):
         
-        save_plotgroup("Orientation Preference and Complexity")
+        #save_plotgroup("Orientation Preference and Complexity")
 
         #save_plotgroup("Position Preference")
         for (x,y) in steps:
@@ -96,13 +96,13 @@ class surround_analysis():
 	f.close()
         
         #self.plot_histograms_of_measures()
-        #lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,0.5)                
+        lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,2.0)                
         
         #pylab.figure()
 	#pylab.imshow(lhi)
 	#pylab.colorbar()
         #release_fig("LHI")
-        #self.plot_map_feature_to_surround_modulation_feature_correlations(lhi,"Local Homogeneity Index")
+        self.plot_map_feature_to_surround_modulation_feature_correlations(lhi,"Local Homogeneity Index")
         #self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationSelectivity'].view()[0],"OrientationSelectivity")
         #self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0]*numpy.pi,"OrientationPreference")
 
