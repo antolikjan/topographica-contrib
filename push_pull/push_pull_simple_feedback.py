@@ -5,7 +5,7 @@ Jan Antolik and James A. Bednar
 Development of Maps of Simple and Complex Cells in the Primary Visual Cortex
 Frontiers in Computation Neuroscience 2011; 5: 17. 
 """
-
+import __main__
 import numpy
 from math import pi, sqrt
 import param
@@ -188,28 +188,28 @@ topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','Joint
 
 #Layer 4C -> 4C
 topo.sim.connect('V1Simple','V1Simple',delay=0.025,name='L4EtoE',
-                 connection_type=CFProjection,strength=0.1,
+                 connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
-                 nominal_bounds_template=BoundingBox(radius=0.12),
+                 nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),
                  learning_rate=0.2)
 
 
 topo.sim.connect('V1Simple','V1SimpleInh',delay=0.025,name='L4EtoI',
-                 connection_type=CFProjection,strength=0.1,
+                 connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
-                 nominal_bounds_template=BoundingBox(radius=0.12),
+                 nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),
                  learning_rate=0.2)
 
 topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,name='L4ItoE',
-                 connection_type=CFProjection,strength=0.3,
+                 connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
-                 nominal_bounds_template=BoundingBox(radius=0.12),learning_fn = CFPLF_KeyserRule("V1Simple",['L4ItoE']),
+                 nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),learning_fn = CFPLF_KeyserRule("V1Simple",['L4ItoE']),
                  learning_rate=1.5)
 
 topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,name='L4ItoI',
-                 connection_type=CFProjection,strength=0.3,
+                 connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
-                 nominal_bounds_template=BoundingBox(radius=0.12),learning_fn = CFPLF_KeyserRule("V1SimpleInh",['L4ItoI']),
+                 nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),learning_fn = CFPLF_KeyserRule("V1SimpleInh",['L4ItoI']),
                  learning_rate=1.5)
 
 
@@ -258,7 +258,7 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.025,name='LateralInhibitory',
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value=0.2,time_constant=8000))))
 
-topo.sim.schedule_command(5000,"secondStage()")
+topo.sim.schedule_command(__main__.__dict__.get("SecondStageTime",5000),"secondStage()")
 
 def secondStage():
     topo.sim.connect('Retina','LGNOn',delay=0.05,
