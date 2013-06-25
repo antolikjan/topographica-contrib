@@ -38,7 +38,7 @@ class surround_analysis():
     data_dict = {}
     
     low_contrast=__main__.__dict__.get('LC',50)
-    high_contrast=100
+    high_contrast=__main__.__dict__.get('HC',100)
     
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
@@ -75,8 +75,8 @@ class surround_analysis():
 
         #save_plotgroup("Position Preference")
         for (x,y) in steps:
-                xindex = x#self.center_r+offset_x+x
-                yindex = y#self.center_c+offset_y+y
+                xindex = self.center_r+offset_x+x
+                yindex = self.center_c+offset_y+y
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
                 c= topo.command.pylabplot.measure_size_response.instance(sheet=self.sheet,num_phase=__main__.__dict__.get('NUM_PHASE',8),num_sizes=ns,max_size=__main__.__dict__.get('MAX_SIZE',3.0),coords=[(xcoor,ycoor)])
                 c.duraton=4.0 #!
