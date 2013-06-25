@@ -55,7 +55,7 @@ elif dataset=="Natural":
     import topo.pattern.image 
     input_type=topo.pattern.image.FileImage
     if locals().get('imageset',"Shouval") == 'Shouval':
-            image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+            image_filenames=["/exports/work/inf_ndtc/s0570140/NEW_ENVIRONMENT/topographica/images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
             inputs=[input_type(filename=f,
                            size=10.0,  #size_normalization='original',(size=10.0)
                                         x=0,
@@ -64,7 +64,7 @@ elif dataset=="Natural":
                                 for f in image_filenames]
                         
     elif locals().get('imageset',"Shouval") == 'Konig':
-        image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
+        image_filenames=["/exports/work/inf_ndtc/s0570140/NEW_ENVIRONMENT/topographica/images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
         print image_filenames
         inputs=[input_type(filename=f,
                         size=10.0,  #size_normalization='original',(size=10.0)

@@ -232,107 +232,70 @@ def complex_surround_analysis_function():
     from topo.base.projection import ProjectionSheet
     from topo.sheet import GeneratorSheet
     import contrib.jacommands
-    import contrib.surround_analysis
+    import contrib.surround_analysis_new
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
 
     import matplotlib
     matplotlib.rc('xtick', labelsize=17)
     matplotlib.rc('ytick', labelsize=17)					
 					
-    print 'A'			
-    SinusoidalMeasureResponseCommand.frequencies=[3.0]    
+    SinusoidalMeasureResponseCommand.frequencies=[2.4]    
     SinusoidalMeasureResponseCommand.scale=__main__.__dict__.get("analysis_scale",0.3)
     from topo.analysis.featureresponses import PatternPresenter            
-    PatternPresenter.duration=2.0
+    PatternPresenter.duration=4.0
     import topo.command.pylabplot
     reload(topo.command.pylabplot)
 
-    print 'B'			
     # Build a list of all sheets worth measuring
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
     input_sheets = topo.sim.objects(GeneratorSheet).values()
-    print 'C'										    
     # Set potentially reasonable defaults; not necessarily useful
     topo.command.analysis.coordinate=(0.0,0.0)
     if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
     if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
-    print 'D'												    
     save_plotgroup("Orientation Preference and Complexity")
     save_plotgroup("Activity",normalize='Individually')
-    print 'E'													
     # Plot all projections for all measured_sheets
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
-    print 'F'			    
 
     if(float(topo.sim.time()) > 6020.0): 
-        contrib.surround_analysis.run_dynamics_analysis(0.0,0.0,0.7,__main__.__dict__.get("analysis_scale",0.3))
-        topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1Complex"])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1Complex"],coords=[(0,0)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0.1]",sheet=topo.sim["V1Complex"],coords=[(0.1,0.1)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,-0.1]",sheet=topo.sim["V1Complex"],coords=[(0.1,-0.1)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,0.1]",sheet=topo.sim["V1Complex"],coords=[(-0.1,0.1)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,-0.1]",sheet=topo.sim["V1Complex"],coords=[(-0.1,-0.1)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.2,0.2]",sheet=topo.sim["V1Complex"],coords=[(0.2,0.2)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.2,-0.2]",sheet=topo.sim["V1Complex"],coords=[(0.2,-0.2)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.2,0.2]",sheet=topo.sim["V1Complex"],coords=[(-0.2,0.2)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.2,-0.2]",sheet=topo.sim["V1Complex"],coords=[(-0.2,-0.2)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0.1]",sheet=topo.sim["V1Complex"],coords=[(0.0,0.1)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.1]",sheet=topo.sim["V1Complex"],coords=[(0.0,-0.1)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,0]",sheet=topo.sim["V1Complex"],coords=[(-0.1,0.0)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0]",sheet=topo.sim["V1Complex"],coords=[(0.1,-0.0)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.3,0.3]",sheet=topo.sim["V1Complex"],coords=[(0.3,0.3)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.3,-0.3]",sheet=topo.sim["V1Complex"],coords=[(0.3,-0.3)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.3,0.3]",sheet=topo.sim["V1Complex"],coords=[(-0.3,0.3)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.3,-0.3]",sheet=topo.sim["V1Complex"],coords=[(-0.3,-0.3)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.24,0.24]",sheet=topo.sim["V1Complex"],coords=[(0.24,0.24)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.24,-0.24]",sheet=topo.sim["V1Complex"],coords=[(0.24,-0.24)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.24,0.24]",sheet=topo.sim["V1Complex"],coords=[(-0.24,0.42)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.24,-0.24]",sheet=topo.sim["V1Complex"],coords=[(-0.24,-0.24)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0.24]",sheet=topo.sim["V1Complex"],coords=[(0.0,0.24)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.24]",sheet=topo.sim["V1Complex"],coords=[(0.0,-0.42)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.24,0]",sheet=topo.sim["V1Complex"],coords=[(-0.24,0.0)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.24,0]",sheet=topo.sim["V1Complex"],coords=[(0.24,-0.0)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0.3]",sheet=topo.sim["V1Complex"],coords=[(0.0,0.3)])()
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.3]",sheet=topo.sim["V1Complex"],coords=[(0.0,-0.3)])()
-	topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.3,0]",sheet=topo.sim["V1Complex"],coords=[(-0.3,0.0)])()    
-        topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.3,0]",sheet=topo.sim["V1Complex"],coords=[(0.3,-0.0)])()
+        #contrib.surround_analysis.run_dynamics_analysis(0.0,0.0,0.7,__main__.__dict__.get("analysis_scale",0.3))
+        #topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1Complex"])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1Complex"],coords=[(0,0)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0.1]",sheet=topo.sim["V1Complex"],coords=[(0.1,0.1)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,-0.1]",sheet=topo.sim["V1Complex"],coords=[(0.1,-0.1)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,0.1]",sheet=topo.sim["V1Complex"],coords=[(-0.1,0.1)])()    
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,-0.1]",sheet=topo.sim["V1Complex"],coords=[(-0.1,-0.1)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.2,0.2]",sheet=topo.sim["V1Complex"],coords=[(0.2,0.2)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.2,-0.2]",sheet=topo.sim["V1Complex"],coords=[(0.2,-0.2)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.2,0.2]",sheet=topo.sim["V1Complex"],coords=[(-0.2,0.2)])()    
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.2,-0.2]",sheet=topo.sim["V1Complex"],coords=[(-0.2,-0.2)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0.1]",sheet=topo.sim["V1Complex"],coords=[(0.0,0.1)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.1]",sheet=topo.sim["V1Complex"],coords=[(0.0,-0.1)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.1,0]",sheet=topo.sim["V1Complex"],coords=[(-0.1,0.0)])()    
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.1,0]",sheet=topo.sim["V1Complex"],coords=[(0.1,-0.0)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.3,0.3]",sheet=topo.sim["V1Complex"],coords=[(0.3,0.3)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.3,-0.3]",sheet=topo.sim["V1Complex"],coords=[(0.3,-0.3)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.3,0.3]",sheet=topo.sim["V1Complex"],coords=[(-0.3,0.3)])()    
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.3,-0.3]",sheet=topo.sim["V1Complex"],coords=[(-0.3,-0.3)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.24,0.24]",sheet=topo.sim["V1Complex"],coords=[(0.24,0.24)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.24,-0.24]",sheet=topo.sim["V1Complex"],coords=[(0.24,-0.24)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.24,0.24]",sheet=topo.sim["V1Complex"],coords=[(-0.24,0.42)])()    
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.24,-0.24]",sheet=topo.sim["V1Complex"],coords=[(-0.24,-0.24)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0.24]",sheet=topo.sim["V1Complex"],coords=[(0.0,0.24)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.24]",sheet=topo.sim["V1Complex"],coords=[(0.0,-0.42)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.24,0]",sheet=topo.sim["V1Complex"],coords=[(-0.24,0.0)])()    
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.24,0]",sheet=topo.sim["V1Complex"],coords=[(0.24,-0.0)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0.3]",sheet=topo.sim["V1Complex"],coords=[(0.0,0.3)])()
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.3]",sheet=topo.sim["V1Complex"],coords=[(0.0,-0.3)])()
+	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.3,0]",sheet=topo.sim["V1Complex"],coords=[(-0.3,0.0)])()    
+        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.3,0]",sheet=topo.sim["V1Complex"],coords=[(0.3,-0.0)])()
 
-        #topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1Simple"])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0,0]",sheet=topo.sim["V1Simple"],coords=[(0,0)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.1,0.1]",sheet=topo.sim["V1Simple"],coords=[(0.1,0.1)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.1,-0.1]",sheet=topo.sim["V1Simple"],coords=[(0.1,-0.1)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.1,0.1]",sheet=topo.sim["V1Simple"],coords=[(-0.1,0.1)])()    
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.1,-0.1]",sheet=topo.sim["V1Simple"],coords=[(-0.1,-0.1)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.2,0.2]",sheet=topo.sim["V1Simple"],coords=[(0.2,0.2)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.2,-0.2]",sheet=topo.sim["V1Simple"],coords=[(0.2,-0.2)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.2,0.2]",sheet=topo.sim["V1Simple"],coords=[(-0.2,0.2)])()    
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.2,-0.2]",sheet=topo.sim["V1Simple"],coords=[(-0.2,-0.2)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0,0.1]",sheet=topo.sim["V1Simple"],coords=[(0.0,0.1)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0,-0.1]",sheet=topo.sim["V1Simple"],coords=[(0.0,-0.1)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.1,0]",sheet=topo.sim["V1Simple"],coords=[(-0.1,0.0)])()    
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.1,0]",sheet=topo.sim["V1Simple"],coords=[(0.1,-0.0)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.3,0.3]",sheet=topo.sim["V1Simple"],coords=[(0.3,0.3)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.3,-0.3]",sheet=topo.sim["V1Simple"],coords=[(0.3,-0.3)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.3,0.3]",sheet=topo.sim["V1Simple"],coords=[(-0.3,0.3)])()    
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.3,-0.3]",sheet=topo.sim["V1Simple"],coords=[(-0.3,-0.3)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.24,0.24]",sheet=topo.sim["V1Simple"],coords=[(0.24,0.24)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.24,-0.24]",sheet=topo.sim["V1Simple"],coords=[(0.24,-0.24)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.24,0.24]",sheet=topo.sim["V1Simple"],coords=[(-0.24,0.42)])()    
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.24,-0.24]",sheet=topo.sim["V1Simple"],coords=[(-0.24,-0.24)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0,0.24]",sheet=topo.sim["V1Simple"],coords=[(0.0,0.24)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0,-0.24]",sheet=topo.sim["V1Simple"],coords=[(0.0,-0.42)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.24,0]",sheet=topo.sim["V1Simple"],coords=[(-0.24,0.0)])()    
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.24,0]",sheet=topo.sim["V1Simple"],coords=[(0.24,-0.0)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0,0.3]",sheet=topo.sim["V1Simple"],coords=[(0.0,0.3)])()
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0,-0.3]",sheet=topo.sim["V1Simple"],coords=[(0.0,-0.3)])()
-	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[-0.3,0]",sheet=topo.sim["V1Simple"],coords=[(-0.3,0.0)])()    
-        #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="SimpleORTC[0.3,0]",sheet=topo.sim["V1Simple"],coords=[(0.3,-0.0)])()
-
-        contrib.surround_analysis.surround_analysis("V1Complex").analyse([(0,0),(5,0),(-5,0),(0,5),(0,-5),(5,5),(5,-5),(-5,5),(-5,-5),(8,0),(-8,0),(0,8),(0,-8),(8,8),(8,-8),(-8,8),(-8,-8)],15,5)
-
+        contrib.surround_analysis_new.surround_analysis("V1Complex").analyse([(0,0),(3,0),(-3,0),(0,3),(0,-3),(3,3),(3,-3),(-3,3),(-3,-3),(6,0),(-6,0),(0,6),(0,-6),(6,6),(6,-6),(-6,6),(-6,-6)],__main__.__dict__.get("number_sizes",10))
+	#contrib.surround_analysis_new.surround_analysis("V1Complex").analyse([(57,57),(53,67),(57,59),(61,63),(53,49),(67,65),(51,67),(67,61),(55,49),(47,59),(63,51)],__main__.__dict__.get("number_sizes",10))
 
 													    
 def v2_analysis_function():

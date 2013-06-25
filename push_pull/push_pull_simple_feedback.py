@@ -35,14 +35,14 @@ from contrib.push_pull.CCLISSOM_push_pull_extra import CFPLF_KeyserRule
 topo.sim.name = "push_pull_simple_feedback"
 
 
+image_filenames=["/home/jan/projects/topographica/images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
 #### Set up retinal inputs
-image_filenames=["images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
 inputs=[topo.pattern.image.FileImage(filename=f,
 	            size=10.0,  #size_normalization='original',(size=10.0)
 	            x=0,y=0,scale=0.55,orientation=0)
         for f in image_filenames]
 
-input = Jitterer(generator=topo.pattern.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=15,jitter_magnitude=0.4)
+input = Jitterer(generator=topo.pattern.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=__main__.__dict__.get("ResetPeriod",15),jitter_magnitude=0.4)
 ring = topo.pattern.Composite(operator=numpy.add,x=numbergen.UniformRandom(lbound=-1.0,ubound=1.0,seed=12),
                                     y=numbergen.UniformRandom(lbound=-1.0,ubound=1.0,seed=36),
 		                    generators=[topo.pattern.Ring(size=0.5, aspect_ratio=1.0, scale=0.064,thickness=0.02,
@@ -66,7 +66,7 @@ CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
 
 # Set up transfer function and homeostatic mechanisms
 V1Simple_OF = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=0.003,eta=0.002)
-V1Simple_OFInh = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=0.003,eta=0.002)
+V1Simple_OFInh = SimpleHomeoLinear(t_init=0.35,alpha=__main__.__dict__.get("InhGain",3),mu=0.003,eta=0.002)
 #V1Simple_OF = HomeostaticResponse(t_init=0.35,linear_slope=3,target_activity=0.003,learning_rate=0.002*18,seed=123,smoothing=0.9946,period=1.0)
 V1Complex_OF=HalfRectify()
 NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=0.02,offset=0.0),operator=numpy.add)
@@ -146,7 +146,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.025,dest_port=('Activity','JointNorm
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOn,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = 0.5,
+                               ExponentialDecay(starting_value = __main__.__dict__.get("Aff_lr",0.5),
                                                 time_constant=16000))))
 
 
@@ -158,7 +158,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.025,dest_port=('Activity','JointNor
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOff,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = 0.5,
+                               ExponentialDecay(starting_value = __main__.__dict__.get("Aff_lr",0.5),
                                                 time_constant=16000))))
 
 
@@ -171,7 +171,7 @@ topo.sim.connect('LGNOn','V1SimpleInh',delay=0.025,dest_port=('Activity','JointN
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOn,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = 0.5,
+                               ExponentialDecay(starting_value = __main__.__dict__.get("Aff_lr",0.5),
                                                 time_constant=16000))))
 
 
@@ -183,7 +183,7 @@ topo.sim.connect('LGNOff','V1SimpleInh',delay=0.025,dest_port=('Activity','Joint
                  nominal_bounds_template=BoundingBox(radius=0.2),
                  coord_mapper=jitterOff,apply_output_fns_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
-                               ExponentialDecay(starting_value = 0.5,
+                               ExponentialDecay(starting_value = __main__.__dict__.get("Aff_lr",0.5),
                                                 time_constant=16000))))
 
 #Layer 4C -> 4C
@@ -215,7 +215,7 @@ topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,name='L4ItoI',
 
 #Layer 2/3
 topo.sim.connect('V1Simple','V1Complex',delay=0.025,
-                 connection_type=CFProjection,strength=2.5,name='V1SimpleAfferent',
+                 connection_type=CFProjection,strength=__main__.__dict__.get('StoCStr',2.5),name='V1SimpleAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=0.05),
                  nominal_bounds_template=BoundingBox(radius=0.075),learning_rate=0.0)
                 
@@ -252,8 +252,8 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.025,name='LateralExcitatory',
 topo.sim.connect('V1Complex','V1Complex',delay=0.025,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-1.5,
                  weights_generator=topo.pattern.Composite(operator=numpy.multiply, 
-                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                topo.pattern.random.UniformRandom()]),
+                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
+                 topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.4),
                  learning_rate=(BoundedNumber(bounds=(0.0,None),generator=
                                ExponentialDecay(starting_value=0.2,time_constant=8000))))

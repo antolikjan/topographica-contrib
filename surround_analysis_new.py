@@ -74,7 +74,6 @@ class surround_analysis():
                 steps.append([(i-grid_step_radius)*step_size,(j-grid_step_radius)*step_size])
          
         self.analyse(steps)
-        
 
     def analyse(self,steps=[],ns=10,offset_x=0,offset_y=0):
         print self.low_contrast
@@ -85,6 +84,8 @@ class surround_analysis():
                 xindex = self.center_r+offset_x+x
                 yindex = self.center_c+offset_y+y
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
+                
+                
                 c= topo.command.pylabplot.measure_size_response.instance(sheet=self.sheet,num_phase=__main__.__dict__.get('NUM_PHASE',8),num_sizes=ns,max_size=__main__.__dict__.get('MAX_SIZE',1.5),coords=[(xcoor,ycoor)])
                 c.duraton=4.0 #!
                 c(coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])        
@@ -202,6 +203,8 @@ class surround_analysis():
         return curve_data 
 
 
+    
+
     def calculate_RF_sizes(self,xindex, yindex):
         curve_data = {}
         hc_curve_name = "Contrast = " + str(self.high_contrast) + "%";
@@ -209,8 +212,8 @@ class surround_analysis():
         for curve_label in [hc_curve_name,lc_curve_name]:
             curve = self.sheet.curve_dict['size'][curve_label]
             curve_data[curve_label] = {}
-            curve_data[curve_label]["data"] = curve  
-            
+            curve_data[curve_label]["data"] = curve
+
             x_values = sorted(curve.keys())
             y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
 
@@ -222,17 +225,17 @@ class surround_analysis():
             if(curve_data[curve_label]["measures"]["peak_near_facilitation"] < (len(y_values) - 1)):
                 curve_data[curve_label]["measures"]["peak_supression_index"] = curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + numpy.argmin(y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + 1:]) + 1
                 curve_data[curve_label]["measures"]["peak_supression"] = x_values[curve_data[curve_label]["measures"]["peak_supression_index"]]
-                curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]  
-                
+                curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
+
             if(curve_data[curve_label]["measures"].has_key("peak_supression_index") and (curve_data[curve_label]["measures"]["peak_supression_index"] < (len(y_values) - 1))):
                 curve_data[curve_label]["measures"]["peak_far_facilitation_index"] = curve_data[curve_label]["measures"]["peak_supression_index"] + numpy.argmax(y_values[curve_data[curve_label]["measures"]["peak_supression_index"] + 1:]) + 1
                 curve_data[curve_label]["measures"]["peak_far_facilitation"] = x_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]]
                 curve_data[curve_label]["measures"]["counter_suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
-                
-                
-        curve_data[hc_curve_name]["measures"]["contrast_dependent_shift"]=curve_data[lc_curve_name]["measures"]["peak_near_facilitation"]/curve_data[hc_curve_name]["measures"]["peak_near_facilitation"]                 
+
+
+        curve_data[hc_curve_name]["measures"]["contrast_dependent_shift"]=curve_data[lc_curve_name]["measures"]["peak_near_facilitation"]/curve_data[hc_curve_name]["measures"]["peak_near_facilitation"]             
         curve_data[lc_curve_name]["measures"]["contrast_dependent_shift"]=curve_data[lc_curve_name]["measures"]["peak_near_facilitation"]/curve_data[hc_curve_name]["measures"]["peak_near_facilitation"]
-        return curve_data   
+        return curve_data
        
 
     def plot_size_tunning(self, xindex, yindex):

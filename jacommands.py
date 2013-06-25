@@ -832,7 +832,9 @@ class Jitterer(PatternGenerator):
     def __init__(self, **params):
         super(Jitterer, self).__init__(**params)
         self.orientation = params.get('orientation', self.orientation)
-        self.r =numbergen.UniformRandom(seed=1023)
+        a = self.orientation # Force generation of first orientation value, I don't know why but on eddie it appears as if the self.orientation still seems to be
+			     # un-itialized at this point and this seems to force for the first random number for it to be drawn  	
+	self.r =numbergen.UniformRandom(seed=1023)
         self.index = 0
         
     def __call__(self, **params):
@@ -843,7 +845,7 @@ class Jitterer(PatternGenerator):
         bounds = params.get('bounds', self.bounds)
 
         if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <= 0.05)):
-            if ((float(topo.sim.time()) <= (self.last_time + self.reset_period + 1.0)) and (float(topo.sim.time()) >= 0.05))    :
+            if ((float(topo.sim.time()) <= (self.last_time + self.reset_period + 1.0)) and (float(topo.sim.time()) >= 0.05)):
                 return Null()(xdensity=xdensity, ydensity=ydensity, bounds=bounds)
         
             self.last_time += self.reset_period
@@ -855,8 +857,12 @@ class Jitterer(PatternGenerator):
             generator.force_new_dynamic_value('y')
             generator.force_new_dynamic_value('scale')
             discards = self.orientation
+	    #print "V"
+	    #print discards	
             
         (a, b, c) = (generator.x, generator.y, generator.scale)   
+	#print float(topo.sim.time())
+	#print self.inspect_value("orientation")
         return generator(xdensity=xdensity, ydensity=ydensity, bounds=bounds, x=self.x + self.jitter_magnitude * self.r(), y=self.y + self.jitter_magnitude * self.r(), orientation=self.inspect_value("orientation"), index=self.inspect_value("index"))
 
 

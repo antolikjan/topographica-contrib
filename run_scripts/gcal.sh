@@ -2,7 +2,7 @@
 #$ -S /bin/bash
 #$ -cwd 
 
-
+source ./virt_envs/topo/bin/activate
 argsprefix=""
 
 echo $argsprefix
