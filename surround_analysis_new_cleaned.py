@@ -16,12 +16,12 @@ import matplotlib.gridspec as gridspec
 from matplotlib import rc
 import topo
 
-rc('text', usetex=True)
-rc('mathtext',default='regular')
+#rc('text', usetex=True)
+#rc('mathtext',default='regular')
 pylab.rc(('xtick.major','xtick.minor','ytick.major','ytick.minor'), pad=8)    
-rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-fontProperties = {'family':'sans-serif','sans-serif':['Helvetica'],
-    'weight' : 'normal', 'size' : 0}
+#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+#fontProperties = {'family':'sans-serif','sans-serif':['Helvetica'],
+#    'weight' : 'normal', 'size' : 0}
 rc('xtick', labelsize=20)
 rc('ytick', labelsize=20)
 rc('legend',fontsize=20)
@@ -149,11 +149,11 @@ class surround_analysis():
         
         if True:
             self.lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,2.0)                
-            f = open(prefix+'lhi2.0.pickle','wb')            
+            f = open(normalize_path('lhi2.0.pickle'),'wb')            
             pickle.dump(self.lhi,f)
             f.close()
         else:        
-            f = open(prefix+'lhi2.0.pickle','rb')            
+            f = open(normalize_path('lhi2.0.pickle'),'rb')            
             self.lhi = pickle.load(f)
 
         
@@ -675,6 +675,7 @@ class surround_analysis():
                         pval= scipy.stats.pearsonr(raster_plots_hc[key][0],raster_plots_hc[key][1])[1] 
                     except FloatingPointError:
                           correlation = 0
+                          pval = 0
                     m,b = numpy.polyfit(raster_plots_hc[key][0],raster_plots_hc[key][1],1)
                     f.plot(raster_plots_hc[key][0],raster_plots_hc[key][1],'ro')
                     f.plot(raster_plots_hc[key][0],m*numpy.array(raster_plots_hc[key][0])+b,'-k',linewidth=2)
@@ -694,6 +695,7 @@ class surround_analysis():
                         pval= scipy.stats.pearsonr(raster_plots_lc[key][0],raster_plots_lc[key][1])[1] 
                     except FloatingPointError:
                           correlation = 0
+                          pval = 0
                     f.plot(raster_plots_lc[key][0],raster_plots_lc[key][1],'ro')
                     f.plot(raster_plots_lc[key][0],m*numpy.array(raster_plots_lc[key][0])+b,'-k',linewidth=2)
                     release_fig("RasterLC<" + map_feature_name + ","+ key + " Corr:"+ str(correlation)+ '|'+ str(pval) + ">")
