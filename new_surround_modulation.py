@@ -105,11 +105,11 @@ class SurroundModulationPlotting():
         print "Number of measured neurons: " , len(self.data_dict.keys())
         if True:
             self.lhi = compute_local_homogeneity_index(self.OR*pi,3.0)    
-            f = open(prefix+'lhi3.0.pickle','wb')            
+            f = open('lhi2.0.pickle','wb')            
             pickle.dump(self.lhi,f)
             f.close()
         else:        
-            f = open(prefix+'lhi2.0.pickle','rb')            
+            f = open('lhi2.0.pickle','rb')            
             self.lhi = pickle.load(f)
         
         # determine pinwheels and domain centers

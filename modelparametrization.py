@@ -2,6 +2,7 @@ import matplotlib.gridspec as gridspec
 from topo.command import  wipe_out_activity, clear_event_queue
 import topo 
 import pylab
+import numpy
 
 class ModelRecording(object):
       """
@@ -45,12 +46,13 @@ class ModelRecording(object):
       
       def present_stimulus_sequence(self,interval,stimuli):
             import numpy
-            print numpy.mean(topo.sim["V1Simple"].output_fns[2].t)
             self.records = {}          
             ip = topo.sim[self.retina].input_generator  
             
             self.pre_test()
             for s in stimuli:
+                print numpy.mean(topo.sim["V1Exc"].output_fns[0].t)
+                print numpy.mean(topo.sim["V1Inh"].output_fns[0].t)
                 if s!= None:
                     topo.sim[self.retina].set_input_generator(s)
                     topo.sim.run(interval)           
@@ -98,9 +100,9 @@ class ModelRecording(object):
           """
           gs = gridspec.GridSpecFromSubplotSpec(1, len(self.records.keys()), subplot_spec=gs)  
           for i,s in enumerate(self.records.keys()):
-              print i
               ax = pylab.subplot(gs[0,i])
               ax.imshow(self.records[s]['activity'][index],cmap='gray') 
+              pylab.title(str(numpy.max(self.records[s]['activity'][index])) + " : " +  str(numpy.min(self.records[s]['activity'][index])))
             
                 
 

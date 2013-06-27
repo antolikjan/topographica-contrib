@@ -37,8 +37,13 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
+<<<<<<< HEAD
     low_contrast=__main__.__dict__.get('LC',50)
     high_contrast=__main__.__dict__.get('HC',100)
+=======
+    low_contrast=__main__.__dict__.get('LC',30)
+    high_contrast=100
+>>>>>>> 455ab3a2d963448fe94a50476261a118bd7c47af
     
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
@@ -67,18 +72,26 @@ class surround_analysis():
         FeatureCurveCommand.num_orientation=12
         
        
-
+    def run_analysis_with_step_grid(self,grid_step_radius,step_size):
+        steps = []
+        for i in xrange(0,grid_step_radius*2+1):
+            for j in xrange(0,grid_step_radius*2+1):
+                steps.append([(i-grid_step_radius)*step_size,(j-grid_step_radius)*step_size])
+         
+        self.analyse(steps)
 
     def analyse(self,steps=[],ns=10,offset_x=0,offset_y=0):
-        
+        print self.low_contrast
+        print self.high_contrast
         #save_plotgroup("Orientation Preference and Complexity")
-
         #save_plotgroup("Position Preference")
         for (x,y) in steps:
                 xindex = self.center_r+offset_x+x
                 yindex = self.center_c+offset_y+y
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
-                c= topo.command.pylabplot.measure_size_response.instance(sheet=self.sheet,num_phase=__main__.__dict__.get('NUM_PHASE',8),num_sizes=ns,max_size=__main__.__dict__.get('MAX_SIZE',3.0),coords=[(xcoor,ycoor)])
+                
+                
+                c= topo.command.pylabplot.measure_size_response.instance(sheet=self.sheet,num_phase=__main__.__dict__.get('NUM_PHASE',8),num_sizes=ns,max_size=__main__.__dict__.get('MAX_SIZE',1.5),coords=[(xcoor,ycoor)])
                 c.duraton=4.0 #!
                 c(coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])        
                 
@@ -90,19 +103,26 @@ class surround_analysis():
                 self.plot_orientation_contrast_tuning(xindex,yindex)
                 self.plot_orientation_contrast_tuning_abs(xindex,yindex)
                 
-	f = open(normalize_path("dict.dat"),'wb')
-	import pickle
-    	pickle.dump(self.data_dict,f)
-	f.close()
+        f = open(normalize_path("dict.dat"),'wb')
+        import pickle
+        pickle.dump(self.data_dict,f)
+        f.close()
+
+        if True:
+            self.lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,2.0)                
+            f = open(prefix+'lhi2.0.pickle','wb')            
+            pickle.dump(self.lhi,f)
+            f.close()
+        else:        
+            f = open(prefix+'lhi2.0.pickle','rb')            
+            self.lhi = pickle.load(f)
+
         
-        #self.plot_histograms_of_measures()
-        lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,2.0)                
-        
-        #pylab.figure()
-	#pylab.imshow(lhi)
-	#pylab.colorbar()
-        #release_fig("LHI")
-        self.plot_map_feature_to_surround_modulation_feature_correlations(lhi,"Local Homogeneity Index")
+        pylab.figure()
+        pylab.imshow(self.lhi)
+        pylab.colorbar()
+        release_fig("LHI")
+        self.plot_map_feature_to_surround_modulation_feature_correlations(self.lhi,"Local Homogeneity Index")
         #self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationSelectivity'].view()[0],"OrientationSelectivity")
         #self.plot_map_feature_to_surround_modulation_feature_correlations(self.sheet.sheet_views['OrientationPreference'].view()[0]*numpy.pi,"OrientationPreference")
 
@@ -188,6 +208,8 @@ class surround_analysis():
         return curve_data 
 
 
+    
+
     def calculate_RF_sizes(self,xindex, yindex):
         curve_data = {}
         hc_curve_name = "Contrast = " + str(self.high_contrast) + "%";
@@ -195,8 +217,8 @@ class surround_analysis():
         for curve_label in [hc_curve_name,lc_curve_name]:
             curve = self.sheet.curve_dict['size'][curve_label]
             curve_data[curve_label] = {}
-            curve_data[curve_label]["data"] = curve  
-            
+            curve_data[curve_label]["data"] = curve
+
             x_values = sorted(curve.keys())
             y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
 
@@ -208,17 +230,17 @@ class surround_analysis():
             if(curve_data[curve_label]["measures"]["peak_near_facilitation"] < (len(y_values) - 1)):
                 curve_data[curve_label]["measures"]["peak_supression_index"] = curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + numpy.argmin(y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + 1:]) + 1
                 curve_data[curve_label]["measures"]["peak_supression"] = x_values[curve_data[curve_label]["measures"]["peak_supression_index"]]
-                curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]  
-                
+                curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
+
             if(curve_data[curve_label]["measures"].has_key("peak_supression_index") and (curve_data[curve_label]["measures"]["peak_supression_index"] < (len(y_values) - 1))):
                 curve_data[curve_label]["measures"]["peak_far_facilitation_index"] = curve_data[curve_label]["measures"]["peak_supression_index"] + numpy.argmax(y_values[curve_data[curve_label]["measures"]["peak_supression_index"] + 1:]) + 1
                 curve_data[curve_label]["measures"]["peak_far_facilitation"] = x_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]]
                 curve_data[curve_label]["measures"]["counter_suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_far_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
-                
-                
-        curve_data[hc_curve_name]["measures"]["contrast_dependent_shift"]=curve_data[lc_curve_name]["measures"]["peak_near_facilitation"]/curve_data[hc_curve_name]["measures"]["peak_near_facilitation"]                 
+
+
+        curve_data[hc_curve_name]["measures"]["contrast_dependent_shift"]=curve_data[lc_curve_name]["measures"]["peak_near_facilitation"]/curve_data[hc_curve_name]["measures"]["peak_near_facilitation"]             
         curve_data[lc_curve_name]["measures"]["contrast_dependent_shift"]=curve_data[lc_curve_name]["measures"]["peak_near_facilitation"]/curve_data[hc_curve_name]["measures"]["peak_near_facilitation"]
-        return curve_data   
+        return curve_data
        
 
     def plot_size_tunning(self, xindex, yindex):
@@ -269,10 +291,6 @@ class surround_analysis():
             x_values = sorted(curve.keys())
             y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
 	    
-	    print "ADSAAAAAAAAAAAAAAAAAAADASDA"
-	    print x_values
-	    print y_values
-
             f.plot(x_values, y_values, lw=3, color=colors[i])
             f.axvline(x=orientation,linewidth=4, color='r')
             i+=1
@@ -358,7 +376,7 @@ class surround_analysis():
                 
                 print self.data_dict[(xcoord,ycoord)][curve_type].keys()
                 
-                if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.low_contrast) + "%"):
+                if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.high_contrast) + "%"):
                     for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
                         if not raster_plots_hc.has_key(measure_name):
                             raster_plots_hc[measure_name]=[[],[]]    
