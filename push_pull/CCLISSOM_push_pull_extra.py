@@ -278,14 +278,11 @@ def domains_stability_test(parameters,parameter_values,sheets,sheets_to_record,r
 
 def check_RF_corrleation_vs_connection_weights_correlation():
     _check_RF_corrleation_vs_connection_weights_correlation(topo.sim["V1Simple"].projections()["LGNOnAfferent"],topo.sim["V1Simple"].projections()["LGNOnAfferent"],topo.sim["V1Simple"].projections()["L4EtoE"],topo.sim["LGNOn"],topo.sim["V1Simple"],topo.sim["V1Simple"])
-    print "1"
     _check_RF_corrleation_vs_connection_weights_correlation(topo.sim["V1Simple"].projections()["LGNOnAfferent"],topo.sim["V1SimpleInh"].projections()["LGNOnAfferentInh"],topo.sim["V1SimpleInh"].projections()["L4EtoI"],topo.sim["LGNOn"],topo.sim["V1Simple"],topo.sim["V1SimpleInh"])
-    print "2"
     _check_RF_corrleation_vs_connection_weights_correlation(topo.sim["V1SimpleInh"].projections()["LGNOnAfferentInh"],topo.sim["V1Simple"].projections()["LGNOnAfferent"],topo.sim["V1Simple"].projections()["L4ItoE"],topo.sim["LGNOn"],topo.sim["V1SimpleInh"],topo.sim["V1Simple"])
-    print "3"
     _check_RF_corrleation_vs_connection_weights_correlation(topo.sim["V1SimpleInh"].projections()["LGNOnAfferentInh"],topo.sim["V1SimpleInh"].projections()["LGNOnAfferentInh"],topo.sim["V1SimpleInh"].projections()["L4ItoI"],topo.sim["LGNOn"],topo.sim["V1SimpleInh"],topo.sim["V1SimpleInh"])
-    print "4"
-    pylab.show()
+    
+    pylab.savefig(normalize_path('RF_connectivity_correlation:' + str(topo.sim.time()) + '.png'));
 
 def _check_RF_corrleation_vs_connection_weights_correlation(source_sheet_afferent_projection,target_sheet_afferent_projection,projection,afferent_sheet,source_sheet,target_sheet):
     """
