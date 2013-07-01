@@ -42,7 +42,7 @@ inputs=[topo.pattern.image.FileImage(filename=f,
 	            x=0,y=0,scale=0.55,orientation=0)
         for f in image_filenames]
 
-input = Jitterer(generator=topo.pattern.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=__main__.__dict__.get("ResetPeriod",15),jitter_magnitude=0.4)
+input = Jitterer(generator=topo.pattern.Selector(generators=inputs),orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=__main__.__dict__.get("ResetPeriod",15),jitter_magnitude=__main__.__dict__.get("JitterMagnitude",0.4))
 ring = topo.pattern.Composite(operator=numpy.add,x=numbergen.UniformRandom(lbound=-1.0,ubound=1.0,seed=12),
                                     y=numbergen.UniformRandom(lbound=-1.0,ubound=1.0,seed=36),
 		                    generators=[topo.pattern.Ring(size=0.5, aspect_ratio=1.0, scale=0.064,thickness=0.02,
@@ -191,26 +191,26 @@ topo.sim.connect('V1Simple','V1Simple',delay=0.025,name='L4EtoE',
                  connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),
-                 learning_rate=0.2)
+                 learning_rate=__main__.__dict__.get("V1SimpleLateralHebbLR",0.2))
 
 
 topo.sim.connect('V1Simple','V1SimpleInh',delay=0.025,name='L4EtoI',
                  connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),
-                 learning_rate=0.2)
+                 learning_rate=__main__.__dict__.get("V1SimpleLateralHebbLR",0.2))
 
 topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,name='L4ItoE',
                  connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),learning_fn = CFPLF_KeyserRule("V1Simple",['L4ItoE']),
-                 learning_rate=1.5)
+                 learning_rate=__main__.__dict__.get("V1SimpleLateralAntiHebbLR",1.5))
 
 topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,name='L4ItoI',
                  connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),learning_fn = CFPLF_KeyserRule("V1SimpleInh",['L4ItoI']),
-                 learning_rate=1.5)
+                 learning_rate=__main__.__dict__.get("V1SimpleLateralAntiHebbLR",1.5))
 
 
 #Layer 2/3
