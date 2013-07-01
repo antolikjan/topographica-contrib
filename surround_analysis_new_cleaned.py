@@ -17,11 +17,11 @@ from matplotlib import rc
 import topo
 
 #rc('text', usetex=True)
-#rc('mathtext',default='regular')
+rc('mathtext',default='regular')
 pylab.rc(('xtick.major','xtick.minor','ytick.major','ytick.minor'), pad=8)    
-#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-#fontProperties = {'family':'sans-serif','sans-serif':['Helvetica'],
-#    'weight' : 'normal', 'size' : 0}
+rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+fontProperties = {'family':'sans-serif','sans-serif':['Helvetica'],
+    'weight' : 'normal', 'size' : 0}
 rc('xtick', labelsize=20)
 rc('ytick', labelsize=20)
 rc('legend',fontsize=20)
@@ -115,14 +115,16 @@ class surround_analysis():
 
             
        
-    def run_analysis_with_step_grid(self,grid_step_radius,step_size):
+    def run_analysis_with_step_grid(self,grid_step_radius,step_size,max_curves=None):
         steps = []
         for i in xrange(0,grid_step_radius*2+1):
             for j in xrange(0,grid_step_radius*2+1):
                 steps.append([self.center_r+(i-grid_step_radius)*step_size,self.center_c+(j-grid_step_radius)*step_size])
-         
-        self.analyse(steps)
-
+        if max_curves != None:
+            self.analyse(steps[0:max_curves])
+        else:
+            self.analyse(steps)
+            
     def analyse(self,cords,ns=10,offset_y=0):
         for (xindex,yindex) in cords:
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
@@ -699,6 +701,7 @@ class surround_analysis():
                     f.plot(raster_plots_lc[key][0],raster_plots_lc[key][1],'ro')
                     f.plot(raster_plots_lc[key][0],m*numpy.array(raster_plots_lc[key][0])+b,'-k',linewidth=2)
                     release_fig("RasterLC<" + map_feature_name + ","+ key + " Corr:"+ str(correlation)+ '|'+ str(pval) + ">")
+            return (raster_plots_lc, raster_plots_hc)
         
     def plot_histograms_of_measures(self):
         histograms_lc = {} 
