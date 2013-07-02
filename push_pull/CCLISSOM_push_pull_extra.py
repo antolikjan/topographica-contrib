@@ -10,6 +10,7 @@ from topo.transferfn import TransferFnWithState
 from topo.pattern import Selector, Null
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.base.arrayutil import clip_lower
+from param import normalize_path
 
 class CFPLF_KeyserRule(CFPLearningFn):
     """
@@ -188,8 +189,6 @@ def _analyse_push_pull_connectivity1(sheet_name,proj_name):
     pylab.plot(numpy.array(app),phase_pref_target.flatten(),'ro')
     pylab.subplot(3,1,3)
     pylab.bar(numpy.arange(2), (numpy.mean(av1),numpy.mean(av2)),   0.35, color='b')
-    
-    from param import normalize_path
     pylab.savefig(normalize_path('PPconnectivity: ' + proj_name + str(topo.sim.time()) + '.png'));
 
 def _analyse_push_pull_connectivity(sheet_name,proj_name):

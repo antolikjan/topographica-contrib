@@ -10,6 +10,7 @@ from math import pi, sqrt, exp, pow
 from topo.plotting.plotfilesaver import * 
 from topo.command.pylabplot import cyclic_tuning_curve, matrixplot
 from topo.command.analysis import save_plotgroup
+from matplotlib.ticker import MaxNLocator
 from param import normalize_path
 from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
 import matplotlib.gridspec as gridspec
