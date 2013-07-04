@@ -65,8 +65,8 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
 
 # Set up transfer function and homeostatic mechanisms
-V1Simple_OF = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=0.003,eta=0.002)
-V1Simple_OFInh = SimpleHomeoLinear(t_init=0.35,alpha=__main__.__dict__.get("InhGain",3),mu=0.003,eta=0.002)
+V1Simple_OF = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=0.003,eta=__main__.__dict__.get("HOMEO_ETA",0.002))
+V1Simple_OFInh = SimpleHomeoLinear(t_init=0.35,alpha=__main__.__dict__.get("InhGain",3),mu=0.003,eta=__main__.__dict__.get("HOMEO_ETA",0.002))
 #V1Simple_OF = HomeostaticResponse(t_init=0.35,linear_slope=3,target_activity=0.003,learning_rate=0.002*18,seed=123,smoothing=0.9946,period=1.0)
 V1Complex_OF=HalfRectify()
 NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=0.02,offset=0.0),operator=numpy.add)
