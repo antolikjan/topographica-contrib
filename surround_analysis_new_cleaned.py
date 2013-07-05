@@ -509,9 +509,10 @@ class surround_analysis():
 
                   inds = numpy.argsort(x_values)
                   y_values = numpy.take(y_values, inds)
-                  x_values = sorted(x_values)
+                  x_values = numpy.take(x_values, inds)
+                  #x_values = sorted(x_values)
                   
-                  if x_values[0] == -numpy.pi/2:
+                  if (x_values[0]+numpy.pi/2.0) < 0.0001:
                     y_values = numpy.append(y_values,[y_values[0]])
                     x_values = numpy.append(x_values,[numpy.pi/2])
                   else:
@@ -535,7 +536,7 @@ class surround_analysis():
         i=0
         
         for curve_label in average_curves.keys():
-            pylab.plot(x_values, average_curves[curve_label]*100, lw=3, color=colors[i]) 
+            pylab.plot(x_values, average_curves[curve_label]*100, lw=3, color=colors[i],label=curve_label) 
             ax = pylab.gca()
             ax.errorbar(x_values, average_curves[curve_label]*100, lw=1, ecolor=colors[i], yerr=sem_curves[curve_label]*100, fmt=None) 
             ax.set_xlim(-numpy.pi/2-0.2,numpy.pi/2.0+0.2)  
@@ -546,7 +547,7 @@ class surround_analysis():
             
             
             i=i+1
-        
+        pylab.legend(loc='lower left')
         disable_top_right_axis(pylab.gca())
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
