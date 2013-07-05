@@ -274,5 +274,5 @@ def secondStage():
     topo.sim['FakeRetina'].set_input_generator(zeroInput)
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
-    randomize_V1Simple_relative_LGN_strength(prob=0.5)
-    randomize_V1Simple_relative_LGN_strength(sheet_name="V1SimpleInh",prob=0.5)
+    randomize_V1Simple_relative_LGN_strength(prob=__main__.__dict__.get("ONOFRandomizationMagnitude",0.5))
+    randomize_V1Simple_relative_LGN_strength(sheet_name="V1SimpleInh",prob=__main__.__dict__.get("ONOFRandomizationMagnitude",0.5))
