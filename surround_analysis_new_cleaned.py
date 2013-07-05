@@ -159,6 +159,18 @@ class surround_analysis():
             f = open(normalize_path('lhi2.0.pickle'),'rb')            
             self.lhi = pickle.load(f)
 
+        # determine pinwheels and domain centers
+        pinwheels = []
+        centers = []
+        for coords in self.data_dict.keys():    
+            if self.lhi[coords] < 0.25:
+               pinwheels.append(coords) 
+            if self.lhi[coords] > 0.80:
+               centers.append(coords) 
+               
+        self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
+        self.plot_average_oct(keys=centers,independent=True,string="domains")
+
         
         pylab.figure()
         pylab.imshow(self.lhi)
