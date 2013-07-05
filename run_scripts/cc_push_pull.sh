@@ -81,7 +81,7 @@ arguments=(
 "A=65,SecondStageTime=1,V1SimpleLateralStrength=0.15,V1SimpleLateralRadius=0.12,V1SimpleLateralHebbLR=0.1,V1SimpleLateralAntiHebbLR=1.5,InhGain=3.0,ResetPeriod=8,JitterMagnitude=0.2,HOMEO_ETA=0.000002")
  
 
-args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/push_pull/push_pull_simple_feedback.ty",analysis_fn=contrib.jaanalysis.push_pull_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/PP2/",times=[5005,10005],snapshot=False,dirname_prefix='
+args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("./topographica/contrib/push_pull/push_pull_simple_feedback.ty",analysis_fn=contrib.jaanalysis.push_pull_analysis_function,output_directory="/exports/home/s0570140/go_new/RESULTS/PP333/",times=[5005,10005],snapshot=False,dirname_prefix='
 
 a="$args 'A$1', $argsprefix ${arguments[$1]}  )"
 echo "${a}"

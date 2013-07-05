@@ -179,6 +179,9 @@ def push_pull_analysis_function():
     from contrib.push_pull.CCLISSOM_push_pull_extra import check_RF_corrleation_vs_connection_weights_correlation
     from param import normalize_path
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
+
+    SinusoidalMeasureResponseCommand.frequencies=[2.4]
+    SinusoidalMeasureResponseCommand.scale=__main__.__dict__.get("analysis_scale",1.0)
     
     print 'Analysing'
     
