@@ -163,9 +163,9 @@ class surround_analysis():
         pinwheels = []
         centers = []
         for coords in self.data_dict.keys():    
-            if self.lhi[coords] < 0.25:
+            if self.lhi[coords] < 0.5:
                pinwheels.append(coords) 
-            if self.lhi[coords] > 0.80:
+            if self.lhi[coords] > 0.5:
                centers.append(coords) 
                
         self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
@@ -547,7 +547,7 @@ class surround_analysis():
             
             
             i=i+1
-        pylab.legend(loc='lower left')
+        #pylab.legend(loc='lower left')
         disable_top_right_axis(pylab.gca())
         pylab.setp(pylab.getp(pylab.gca(), 'xticklabels'), fontsize=20)
         pylab.setp(pylab.getp(pylab.gca(), 'yticklabels'), fontsize=20)
