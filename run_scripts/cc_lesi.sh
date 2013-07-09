@@ -3,7 +3,7 @@
 #$ -l h_rt=47:59:00
 #$ -q ecdf
 #$ -R y
-#$ -pe OpenMP 8
+#$ -pe OpenMP 6
 #$ -N cc_lesi
 export OMP_NUM_THREADS=$NSLOTS
 source /exports/home/v1jantol/go_new/virt_envs/topo/bin/activate
@@ -41,4 +41,4 @@ arguments=(
 args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("/exports/home/v1jantol/go_new/topographica/contrib/cc_lesi_final.ty",analysis_fn=contrib.jaanalysis.complex_surround_analysis_function,output_directory="/exports/home/v1jantol/go_new/RESULTS/CCLESI4/",times=[10000],snapshot=False,dirname_prefix='
 a="$args 'A$1', $argsprefix ${arguments[$1]}  )"
 echo "${a}"
-/exports/home/v1jantol/go_new/topographica/topographica -c openmp=True  -c openmp_threads=8 -c "${a}"
+/exports/home/v1jantol/go_new/topographica/topographica -c openmp=True  -c openmp_threads=6 -c "${a}"
