@@ -298,7 +298,7 @@ def complex_surround_analysis_function():
 	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.3,0]",sheet=topo.sim["V1Complex"],coords=[(-0.3,0.0)])()    
         #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.3,0]",sheet=topo.sim["V1Complex"],coords=[(0.3,-0.0)])()
 	
-	contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").run_analysis_with_step_grid(3,4,max_curves=20)
+	contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").run_analysis_with_step_grid(4,4,max_curves=__main__.__dict__.get("max_curves",20))
         #contrib.surround_analysis_new.surround_analysis("V1Complex").analyse([(0,0),(3,0),(-3,0),(0,3),(0,-3),(3,3),(3,-3),(-3,3),(-3,-3),(6,0),(-6,0),(0,6),(0,-6),(6,6),(6,-6),(-6,6),(-6,-6)],__main__.__dict__.get("number_sizes",10))
 	#contrib.surround_analysis_new.surround_analysis("V1Complex").analyse([(57,57),(53,67),(57,59),(61,63),(53,49),(67,65),(51,67),(67,61),(55,49),(47,59),(63,51)],__main__.__dict__.get("number_sizes",10))
 
