@@ -32,6 +32,7 @@ from topo.base.patterngenerator import PatternGenerator, Constant
 from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
 from contrib.jacommands import SimpleHomeoLinear, Jitterer, Expander, randomize_V1Simple_relative_LGN_strength, Jitter
 from contrib.push_pull.CCLISSOM_push_pull_extra import CFPLF_KeyserRule
+#from topo.sparse.sparsecf import SparseCFProjection,compute_sparse_joint_norm_totals
 topo.sim.name = "push_pull_simple_feedback"
 
 
@@ -57,12 +58,15 @@ zeroInput = topo.pattern.Null();
 jitterOn = Jitter(rand =numbergen.UniformRandom(seed=1023))
 jitterOff = Jitter(rand =numbergen.UniformRandom(seed=1023))
 
+
+
 # Specify weight initialization, response function, and learning function
 CFProjection.weights_generator=topo.pattern.random.UniformRandom()
 CFProjection.cf_shape=topo.pattern.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
+#SparseCFProjection.cf_shape=topo.pattern.Disk(smoothing=0.0)
 
 # Set up transfer function and homeostatic mechanisms
 V1Simple_OF = SimpleHomeoLinear(t_init=0.35,alpha=3,mu=0.003,eta=__main__.__dict__.get("HOMEO_ETA",0.002))
@@ -70,6 +74,36 @@ V1Simple_OFInh = SimpleHomeoLinear(t_init=0.35,alpha=__main__.__dict__.get("InhG
 #V1Simple_OF = HomeostaticResponse(t_init=0.35,linear_slope=3,target_activity=0.003,learning_rate=0.002*18,seed=123,smoothing=0.9946,period=1.0)
 V1Complex_OF=HalfRectify()
 NN = PatternCombine(generator=topo.pattern.random.GaussianRandom(scale=0.02,offset=0.0),operator=numpy.add)
+
+
+
+
+class GaussianBinaryDisk(topo.pattern.Composite):
+
+    gaussian_size = param.Number(default=1.0,doc="Size of the Gaussian pattern.")
+
+    disk_size = param.Number(default=1.0)
+
+    noise_scale = param.Number(default=1.0)
+
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc="""
+        Ratio of gaussian width to height; width is gaussian_size*aspect_ratio.""")
+
+    offset = param.Number(default=0.0,bounds=(-1.0,1.0))
+
+    def __call__(self,**params_to_override):
+        p = param.ParamOverrides(self,params_to_override)
+        gauss = topo.pattern.Gaussian(aspect_ratio=p.aspect_ratio,size=p.gaussian_size)
+        unirand = topo.pattern.random.UniformRandom(scale=p.noise_scale)
+        gaussrand = topo.pattern.Composite(generators=[gauss,unirand],operator=numpy.add)
+        p.generators=[gaussrand,topo.pattern.Disk(smoothing=0.0,size=1.0)]
+        p.operator=numpy.multiply
+        mat = super(GaussianBinaryDisk,self).__call__(**p)
+        mat = mat - mat.min()
+        mat /= mat.max()
+
+        return (mat+p.offset).round()
 
 
 
@@ -191,26 +225,30 @@ topo.sim.connect('V1Simple','V1Simple',delay=0.025,name='L4EtoE',
                  connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),
-                 learning_rate=__main__.__dict__.get("V1SimpleLateralHebbLR",0.2))
+                 learning_rate=__main__.__dict__.get("V1SimpleLateralHebbLR",0.2),
+                 cf_shape=GaussianBinaryDisk(gaussian_size=0.25,offset=0.2,disk_size=__main__.__dict__.get("V1SimpleLateralRadius",0.12)))
 
 
 topo.sim.connect('V1Simple','V1SimpleInh',delay=0.025,name='L4EtoI',
                  connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),
-                 learning_rate=__main__.__dict__.get("V1SimpleLateralHebbLR",0.2))
+                 learning_rate=__main__.__dict__.get("V1SimpleLateralHebbLR",0.2),
+                 cf_shape=GaussianBinaryDisk(gaussian_size=0.4,offset=0.2,disk_size=__main__.__dict__.get("V1SimpleLateralRadius",0.12)))
 
 topo.sim.connect('V1SimpleInh','V1Simple',delay=0.025,name='L4ItoE',
                  connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),learning_fn = CFPLF_KeyserRule("V1Simple",['L4ItoE']),
-                 learning_rate=__main__.__dict__.get("V1SimpleLateralAntiHebbLR",1.5))
+                 learning_rate=__main__.__dict__.get("V1SimpleLateralAntiHebbLR",1.5),
+                 cf_shape=GaussianBinaryDisk(gaussian_size=0.4,offset=0.2,disk_size=__main__.__dict__.get("V1SimpleLateralRadius",0.12)))
 
 topo.sim.connect('V1SimpleInh','V1SimpleInh',delay=0.025,name='L4ItoI',
                  connection_type=CFProjection,strength=__main__.__dict__.get("V1SimpleLateralStrength",0.1),
                  weights_generator=topo.pattern.Gaussian(aspect_ratio=1.0, size=0.4),
                  nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get("V1SimpleLateralRadius",0.12)),learning_fn = CFPLF_KeyserRule("V1SimpleInh",['L4ItoI']),
-                 learning_rate=__main__.__dict__.get("V1SimpleLateralAntiHebbLR",1.5))
+                 learning_rate=__main__.__dict__.get("V1SimpleLateralAntiHebbLR",1.5),
+                 cf_shape=GaussianBinaryDisk(gaussian_size=0.4,offset=0.2,disk_size=__main__.__dict__.get("V1SimpleLateralRadius",0.12)))
 
 
 #Layer 2/3
