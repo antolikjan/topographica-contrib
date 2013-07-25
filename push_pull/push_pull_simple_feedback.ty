@@ -36,7 +36,7 @@ from contrib.push_pull.CCLISSOM_push_pull_extra import CFPLF_KeyserRule
 topo.sim.name = "push_pull_simple_feedback"
 
 
-image_filenames=["/home/jan/projects/topographica/images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
+image_filenames=["/exports/work/inf_ndtc/s0570140/NEW_ENVIRONMENT/topographica/images/konig/seq1/seq1-%05d.tif"%(i*10+1) for i in xrange(100)]
 #### Set up retinal inputs
 inputs=[topo.pattern.image.FileImage(filename=f,
 	            size=10.0,  #size_normalization='original',(size=10.0)

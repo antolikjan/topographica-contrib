@@ -130,12 +130,12 @@ topo.sim['FakeRetina']=GeneratorSheet(nominal_density=24.0,
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=core_size+0.25+0.5))
 
-topo.sim['LGNOn']=LISSOM(nominal_density=24.0,
+topo.sim['LGNOn']=LISSOM(nominal_density=locals().get('c_default_density',24.0),
                           nominal_bounds=BoundingBox(radius=core_size+0.25+0.5),
                           output_fns=[HalfRectify()],tsettle=0,
                           measure_maps=False)
 
-topo.sim['LGNOff']=LISSOM(nominal_density=24.0,
+topo.sim['LGNOff']=LISSOM(nominal_density=locals().get('c_default_density',24.0),
                            nominal_bounds=BoundingBox(radius=core_size+0.25+0.5),
                            output_fns=[HalfRectify()],tsettle=0,
                            measure_maps=False)

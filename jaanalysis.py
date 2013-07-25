@@ -176,9 +176,12 @@ def push_pull_analysis_function():
     from topo.sheet import GeneratorSheet
     from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
     import contrib.jacommands
-    from contrib.CCLISSOM_push_pull_extra import analyse_push_pull_connectivity
+    from contrib.push_pull.CCLISSOM_push_pull_extra import check_RF_corrleation_vs_connection_weights_correlation
     from param import normalize_path
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
+
+    SinusoidalMeasureResponseCommand.frequencies=[2.4]
+    SinusoidalMeasureResponseCommand.scale=__main__.__dict__.get("analysis_scale",1.0)
     
     print 'Analysing'
     
@@ -208,7 +211,8 @@ def push_pull_analysis_function():
             save_plotgroup("Projection",projection=p,density=3.0)
 
     print 'Starting push pull analysis'	
-    analyse_push_pull_connectivity()
+    #analyse_push_pull_connectivity()
+    check_RF_corrleation_vs_connection_weights_correlation()
     print 'Finished push pull analysis'
     return
     if(float(topo.sim.time()) >= 10005.0): 
@@ -232,7 +236,7 @@ def complex_surround_analysis_function():
     from topo.base.projection import ProjectionSheet
     from topo.sheet import GeneratorSheet
     import contrib.jacommands
-    import contrib.surround_analysis_new
+    import contrib.surround_analysis_new_cleaned
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
 
     import matplotlib
@@ -293,8 +297,9 @@ def complex_surround_analysis_function():
         #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,-0.3]",sheet=topo.sim["V1Complex"],coords=[(0.0,-0.3)])()
 	#topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[-0.3,0]",sheet=topo.sim["V1Complex"],coords=[(-0.3,0.0)])()    
         #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0.3,0]",sheet=topo.sim["V1Complex"],coords=[(0.3,-0.0)])()
-
-        contrib.surround_analysis_new.surround_analysis("V1Complex").analyse([(0,0),(3,0),(-3,0),(0,3),(0,-3),(3,3),(3,-3),(-3,3),(-3,-3),(6,0),(-6,0),(0,6),(0,-6),(6,6),(6,-6),(-6,6),(-6,-6)],__main__.__dict__.get("number_sizes",10))
+	
+	contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").run_analysis_with_step_grid(4,4,max_curves=__main__.__dict__.get("max_curves",20))
+        #contrib.surround_analysis_new.surround_analysis("V1Complex").analyse([(0,0),(3,0),(-3,0),(0,3),(0,-3),(3,3),(3,-3),(-3,3),(-3,-3),(6,0),(-6,0),(0,6),(0,-6),(6,6),(6,-6),(-6,6),(-6,-6)],__main__.__dict__.get("number_sizes",10))
 	#contrib.surround_analysis_new.surround_analysis("V1Complex").analyse([(57,57),(53,67),(57,59),(61,63),(53,49),(67,65),(51,67),(67,61),(55,49),(47,59),(63,51)],__main__.__dict__.get("number_sizes",10))
 
 													    

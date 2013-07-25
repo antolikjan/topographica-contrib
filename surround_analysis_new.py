@@ -37,8 +37,13 @@ class surround_analysis():
     sheet_name = ""
     data_dict = {}
     
+<<<<<<< HEAD
+    low_contrast=__main__.__dict__.get('LC',50)
+    high_contrast=__main__.__dict__.get('HC',100)
+=======
     low_contrast=__main__.__dict__.get('LC',30)
     high_contrast=100
+>>>>>>> 455ab3a2d963448fe94a50476261a118bd7c47af
     
     def __init__(self,sheet_name="V1Complex"):
         from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
