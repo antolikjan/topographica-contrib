@@ -289,10 +289,14 @@ class surround_analysis():
             curve_data[curve_label]["measures"]["peak_near_facilitation_index"] = numpy.argmax(y_values)
             curve_data[curve_label]["measures"]["peak_near_facilitation"] = x_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
 
-            if(curve_data[curve_label]["measures"]["peak_near_facilitation"] < (len(y_values) - 1)):
+            if(curve_data[curve_label]["measures"]["peak_near_facilitation_index"] < (len(y_values) - 1)):
                 curve_data[curve_label]["measures"]["peak_supression_index"] = curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + numpy.argmin(y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + 1:]) + 1
                 curve_data[curve_label]["measures"]["peak_supression"] = x_values[curve_data[curve_label]["measures"]["peak_supression_index"]]
                 curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
+	    else:
+	        curve_data[curve_label]["measures"]["peak_supression_index"]=len(y_values)-1
+		curve_data[curve_label]["measures"]["peak_supression"]=x_values[curve_data[curve_label]["measures"]["peak_supression_index"]]
+		curve_data[curve_label]["measures"]["suppresion_index"]=0
 
             if(curve_data[curve_label]["measures"].has_key("peak_supression_index") and (curve_data[curve_label]["measures"]["peak_supression_index"] < (len(y_values) - 1))):
                 curve_data[curve_label]["measures"]["peak_far_facilitation_index"] = curve_data[curve_label]["measures"]["peak_supression_index"] + numpy.argmax(y_values[curve_data[curve_label]["measures"]["peak_supression_index"] + 1:]) + 1
