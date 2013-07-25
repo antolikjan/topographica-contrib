@@ -182,11 +182,11 @@ topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals
                         output_fns=[ActivityHysteresis(time_constant=locals().get('STC',0.3)),NN,V1Simple_OF])
 
                         
-topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
+topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('c_default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
                         output_fns=[ActivityHysteresis(time_constant=locals().get('CTC',0.3)),V1Complex_OF])
 
-topo.sim['V1ComplexInh'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',96.0),
+topo.sim['V1ComplexInh'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('c_default_density',96.0),
                         nominal_bounds=BoundingBox(radius=core_size),
                         output_fns=[ActivityHysteresis(time_constant=locals().get('CTC',0.3)),V1ComplexInh_OF])
 
