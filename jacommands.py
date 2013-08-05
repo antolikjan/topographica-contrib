@@ -368,7 +368,6 @@ class SimpleHomeoLinear(TransferFnWithState):
         self.__current_state_stack=[]
         
     def __call__(self, x):
-        print numpy.mean(self.t)
         if self.first_call:
             self.first_call = False
             if self.randomized_init:
@@ -377,7 +376,7 @@ class SimpleHomeoLinear(TransferFnWithState):
                 self.t = ones(x.shape, x.dtype.char) * self.t_init
             
             self.y_avg = ones(x.shape, x.dtype.char) * self.mu
-
+        
         x_orig = copy(x)
         x -= self.t
         clip_lower(x, 0)
