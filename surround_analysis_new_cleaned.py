@@ -96,7 +96,7 @@ class surround_analysis():
         
         
             from topo.analysis.featureresponses import PatternPresenter            
-            PatternPresenter.duration=4.0 #!
+            PatternPresenter.duration=__main__.__dict__.get('duration',4.0) #!
             import topo.command.pylabplot
             reload(topo.command.pylabplot)
 
@@ -131,7 +131,7 @@ class surround_analysis():
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
                 print "Starting surround analysis for cell with index coords and sheet coords: [%d,%d] [%f,%f]"  % (xindex,yindex,xcoor,ycoor) 
                 
-                c= topo.command.pylabplot.measure_size_response.instance(sheet=self.sheet,num_phase=__main__.__dict__.get('NUM_PHASE',8),num_sizes=ns,max_size=__main__.__dict__.get('MAX_SIZE',1.5),coords=[(xcoor,ycoor)])
+                c= topo.command.pylabplot.measure_size_response.instance(sheet=self.sheet,num_phase=__main__.__dict__.get('NUM_PHASE',8),num_sizes=ns,max_size=__main__.__dict__.get('MAX_SIZE',1.5),coords=[(xcoor,ycoor)],duration=__main__.__dict__.get('duration',4.0))
                 c.duraton=4.0 #!
                 c(coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)])        
                 
@@ -191,7 +191,7 @@ class surround_analysis():
 
         curve_data={}
 
-        topo.command.pylabplot.measure_or_tuning(num_phase=__main__.__dict__.get('NUM_PHASE',8),num_orientation=12,size=curve["measures"]["peak_near_facilitation"]+__main__.__dict__.get('INC',0.0),curve_parameters=[{"contrast":contrast_center}],display=True,coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)],duration=4.0)
+        topo.command.pylabplot.measure_or_tuning(num_phase=__main__.__dict__.get('NUM_PHASE',8),num_orientation=12,size=curve["measures"]["peak_near_facilitation"]+__main__.__dict__.get('INC',0.0),curve_parameters=[{"contrast":contrast_center}],display=True,coords=[(xcoor,ycoor)],frequencies=[__main__.__dict__.get('FREQ',2.4)],duration=__main__.__dict__.get('duration',4.0))
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",coords=[(xcoor,ycoor)])
 
         curve_name_ort = "Contrast = " + str(contrast_center) + "%";
@@ -224,7 +224,7 @@ class surround_analysis():
                                                              display=False,
                                                              contrastcenter=contrast_center,
                                                              thickness=4.0-curve["measures"]["peak_near_facilitation"]-__main__.__dict__.get('SPACE',0.0)-__main__.__dict__.get('INC',0.0),
-                                                             duration=4.0,
+                                                             duration=__main__.__dict__.get('duration',4.0),
                                                              num_phase=__main__.__dict__.get('NUM_PHASE',8),
                                  frequencies=[__main__.__dict__.get('FREQ',2.4)],
                                                              curve_parameters=[{"contrastsurround":contrast_center}],coords=[(xcoor,ycoor)])

@@ -368,7 +368,7 @@ class SimpleHomeoLinear(TransferFnWithState):
         self.__current_state_stack=[]
         
     def __call__(self, x):
-       
+        print numpy.mean(self.t)
         if self.first_call:
             self.first_call = False
             if self.randomized_init:
