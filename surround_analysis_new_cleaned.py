@@ -219,7 +219,7 @@ class surround_analysis():
         print "ORIENTATION:", orr 
         topo.command.pylabplot.measure_orientation_contrast(sizecenter=curve["measures"]["peak_near_facilitation"]+__main__.__dict__.get('INC',0.0),
                                                              orientation_center=orr,
-                                                             phasecenter=self.sheet.sheet_views['PhasePreference'].view()[0][xindex][yindex]*2*pi,
+                                                             #phasecenter=self.sheet.sheet_views['PhasePreference'].view()[0][xindex][yindex]*2*pi,
                                                              sizesurround=4.0,
                                                              size=0.0,
                                                              display=False,
