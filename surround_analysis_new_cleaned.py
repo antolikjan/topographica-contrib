@@ -212,7 +212,6 @@ class surround_analysis():
 
 
 
-        orr_ort = orr + (numpy.pi/2.0)        
         curve_data["ORTC"]={}
         curve_data["ORTC"]["info"]={}
         curve_data["ORTC"]["info"]["pref_or"]=orr
@@ -229,10 +228,13 @@ class surround_analysis():
                                                              num_phase=__main__.__dict__.get('NUM_PHASE',8),
                                  frequencies=[__main__.__dict__.get('FREQ',2.4)],
                                                              curve_parameters=[{"contrastsurround":contrast_center}],coords=[(xcoor,ycoor)])
-
-       
-
-        for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
+        
+	for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
+   	    # due to rounding errors lets find the orthogonal orientation
+	    surr_ors =  numpy.array(self.sheet.curve_dict['orientationsurround'][curve_label].keys())
+            orr_ort = surr_ors[numpy.argmin(numpy.abs(surr_ors - orr - numpy.pi/2.0))]
+            orr = surr_ors[numpy.argmin(numpy.abs(surr_ors - orr))]
+		
             print curve_label
             curve_data[curve_label]={}
             curve_data[curve_label]["data"]=self.sheet.curve_dict['orientationsurround'][curve_label]
