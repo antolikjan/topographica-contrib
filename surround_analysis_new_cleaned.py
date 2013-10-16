@@ -220,7 +220,22 @@ class surround_analysis():
         curve_data["ORTC"]["info"]={}
         curve_data["ORTC"]["info"]["pref_or"]=orr
         print "ORIENTATION:", orr 
-        topo.command.pylabplot.measure_orientation_contrast(sizecenter=curve["measures"]["peak_near_facilitation"]+__main__.__dict__.get('INC',0.0),
+        
+        if __main__.__dict__.get('LimitedSurround',False):
+            topo.command.pylabplot.measure_orientation_contrast(sizecenter=curve["measures"]["peak_near_facilitation"],
+                                                             orientation_center=orr,
+                                                             #phasecenter=self.sheet.sheet_views['PhasePreference'].view()[0][xindex][yindex]*2*pi,
+                                                             sizesurround=(curve["measures"]["peak_supression"]+curve["measures"]["peak_near_facilitation"])/2,
+                                                             size=0.0,
+                                                             display=False,
+                                                             contrastcenter=contrast_center,
+                                                             thickness=(curve["measures"]["peak_supression"]-curve["measures"]["peak_near_facilitation"])/2,
+                                                             duration=__main__.__dict__.get('duration',4.0),
+                                                             num_phase=__main__.__dict__.get('NUM_PHASE',8),
+                                                             frequencies=[__main__.__dict__.get('FREQ',2.4)],
+                                                             curve_parameters=[{"contrastsurround":contrast_center}],coords=[(xcoor,ycoor)])                  
+        else:
+            topo.command.pylabplot.measure_orientation_contrast(sizecenter=curve["measures"]["peak_near_facilitation"]+__main__.__dict__.get('INC',0.0),
                                                              orientation_center=orr,
                                                              #phasecenter=self.sheet.sheet_views['PhasePreference'].view()[0][xindex][yindex]*2*pi,
                                                              sizesurround=4.0,
