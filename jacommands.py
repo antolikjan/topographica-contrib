@@ -570,6 +570,7 @@ def randomize_V1Simple_relative_LGN_strength(sheet_name="V1Simple", prob=0.5):
             
 
 import topo.transferfn
+import topo.transferfn.misc
 ActivityHysteresis = topo.transferfn.Hysteresis
 SimpleHomeoLinearRelative = topo.transferfn.misc.HomeostaticResponse
 

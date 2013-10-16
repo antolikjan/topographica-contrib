@@ -25,21 +25,8 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_LOWCONTRAST3_A=1/'
-prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_LOWCONTRAST3_A=1/out3'
-
-#prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_SPACE=0.0_NUM_PHASE=16_LC=15/'
-#prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2_SPACE=0.0_NUM_PHASE=16_LC=15/out_new'
-
-
-
-
-#prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/'
-#prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew6NNBig=2/out2.new.test3'
-
-#prefix = '/home/jan/DATA/LESI/CCLESIGifSMNew4EEBig=9NEWJoined/'
-#prefix_out = '/home/jan/DATA/LESI/CCLESIGifSMNew4EEBig=9NEWJoined/out'
-
+prefix = '/home/jan/DATA/LESI/CCLESISM_CCLESI24_A0_5thTake/OUT/'
+prefix_out = '/home/jan/DATA/LESI/CCLESISM_CCLESI24_A0_5thTake/OUT/out'
 
 normalize_path.prefix = prefix_out
 
@@ -86,8 +73,8 @@ def remove_y_tick_labels():
 
 class SurroundModulationPlotting():
 
-    low_contrast=40
-    high_contrast=100
+    low_contrast=100
+    high_contrast=200
     
     def __init__(self):
         import pylab
@@ -103,22 +90,22 @@ class SurroundModulationPlotting():
         self.recalculate_size_tuning_measures()
         
         print "Number of measured neurons: " , len(self.data_dict.keys())
-        if True:
-            self.lhi = compute_local_homogeneity_index(self.OR*pi,3.0)    
-            f = open('lhi2.0.pickle','wb')            
+        if False:
+            self.lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
+            f = open(prefix_out+'/lhi2.0.pickle','wb')            
             pickle.dump(self.lhi,f)
             f.close()
         else:        
-            f = open('lhi2.0.pickle','rb')            
+            f = open(prefix_out+'/lhi2.0.pickle','rb')            
             self.lhi = pickle.load(f)
         
         # determine pinwheels and domain centers
         pinwheels = []
         centers = []
         for coords in self.data_dict.keys():    
-            if self.lhi[coords] < 0.25:
+            if self.lhi[coords] < 0.5:
                pinwheels.append(coords) 
-            if self.lhi[coords] > 0.80:
+            if self.lhi[coords] > 0.5:
                centers.append(coords) 
                
         self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
@@ -168,9 +155,10 @@ class SurroundModulationPlotting():
 
                     
                     curve =  measurment[curve_label]["data"]
-                    
                     orr = measurment["ORTC"]["info"]["pref_or"]
-                    orr_ort = orr + (numpy.pi/2.0)        
+               	    surr_ors =  numpy.array(curve.keys())
+                    orr_ort = surr_ors[numpy.argmin(numpy.abs(surr_ors - orr - numpy.pi/2.0))]
+                    orr = surr_ors[numpy.argmin(numpy.abs(surr_ors - orr))]
                     
                     pref_or_resp=curve[orr].view()[0][xindex][yindex]
                     cont_or_resp=curve[orr_ort].view()[0][xindex][yindex]
@@ -981,3 +969,6 @@ def compute_local_homogeneity_index(or_map,sigma):
             lhi[sx,sy]= numpy.sqrt(lhi_current[0]*lhi_current[0] + lhi_current[1]*lhi_current[1])/(2*numpy.pi*sigma*sigma)
             
     return lhi
+
+
+SurroundModulationPlotting()
