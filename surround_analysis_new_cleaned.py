@@ -126,8 +126,12 @@ class surround_analysis():
         else:
             self.analyse(steps)
             
-    def analyse(self,cords,ns=10,offset_y=0):
+    def analyse(self,cords,ns=10,absolute=True):
         for (xindex,yindex) in cords:
+		if absolute==False:
+			xindex = self.center_c + xindex  
+			yindex = self.center_r + yindex
+
                 xcoor,ycoor = self.sheet.matrixidx2sheet(xindex,yindex)
                 print "Starting surround analysis for cell with index coords and sheet coords: [%d,%d] [%f,%f]"  % (xindex,yindex,xcoor,ycoor) 
                 
@@ -244,10 +248,10 @@ class surround_analysis():
             cont_or_resp=self.sheet.curve_dict['orientationsurround'][curve_label][orr_ort].view()[0][xindex][yindex]
             
             
-            if pref_or_resp != 0:
+            if peak_or_response != 0:
                 curve_data[curve_label]["measures"]["or_suppression"]=(cont_or_resp-pref_or_resp)/peak_or_response
             else: 
-                curve_data[curve_label]["measures"]["or_suppression"]=-1.0
+                curve_data[curve_label]["measures"]["or_suppression"]=0.0
             
             x_values = sorted(curve_data[curve_label]["data"].keys())
             y_values = []
@@ -293,6 +297,8 @@ class surround_analysis():
             curve_data[curve_label]["measures"]["peak_near_facilitation"] = x_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
 
             if(curve_data[curve_label]["measures"]["peak_near_facilitation_index"] < (len(y_values) - 1)):
+		print y_values
+		print curve_label
                 curve_data[curve_label]["measures"]["peak_supression_index"] = curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + numpy.argmin(y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"] + 1:]) + 1
                 curve_data[curve_label]["measures"]["peak_supression"] = x_values[curve_data[curve_label]["measures"]["peak_supression_index"]]
                 curve_data[curve_label]["measures"]["suppresion_index"] = (y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]] - y_values[curve_data[curve_label]["measures"]["peak_supression_index"]])/ y_values[curve_data[curve_label]["measures"]["peak_near_facilitation_index"]]
@@ -494,7 +500,7 @@ class surround_analysis():
           m = numpy.max([curve[l].view()[0][xindex, yindex] for l in x_values])
             
           for curve_label in self.data_dict[k]["OCT"].keys():
-              if curve_label != 'Contrastsurround = 100%':                
+              if curve_label != 'Contrastsurround = 0%':                
                   orientation = self.data_dict[(xindex,yindex)]["OCT"]["ORTC"]["info"]["pref_or"]
                   curve =  self.data_dict[k]["OCT"][curve_label]["data"]
                   x_values = sorted(curve.keys())
