@@ -235,6 +235,8 @@ def complex_surround_analysis_function():
     from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
     from topo.base.projection import ProjectionSheet
     from topo.sheet import GeneratorSheet
+    from topo.command import save_snapshot
+    from param import normalize_path
     import contrib.jacommands
     import contrib.surround_analysis_new_cleaned
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
@@ -265,7 +267,11 @@ def complex_surround_analysis_function():
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
 
-    if(float(topo.sim.time()) > 6020.0): 
+    if(float(topo.sim.time()) > 6020.0):
+        if __main__.__dict__.get("save",False):
+                save_snapshot(normalize_path('snapshot.typ'))
+
+ 
         #contrib.surround_analysis.run_dynamics_analysis(0.0,0.0,0.7,__main__.__dict__.get("analysis_scale",0.3))
         #topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1Complex"])()
         #topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1Complex"],coords=[(0,0)])()
@@ -424,6 +430,7 @@ def gc_homeo_af():
         reload(topo.command.pylabplot)
         topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1"],repetitions=10)(repetitions=10)
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1"],coords=[(0,0)])()
+
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1"],coords=[(0.1,0)])()
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1"],coords=[(0.1,0.1)])()
         topo.command.pylabplot.cyclic_tuning_curve.instance(x_axis="orientation",filename="ORTC[0,0]",sheet=topo.sim["V1"],coords=[(0,0.1)])()
@@ -450,4 +457,21 @@ def saver_function():
     save_snapshot(normalize_path('snapshot.typ'))
 
 def empty():
-    a = 10
+    a = 1
+
+def sa():
+    import topo
+    from topo.command.analysis import save_plotgroup
+    from param import normalize_path
+    import contrib.jacommands
+    import contrib.surround_analysis_new_cleaned
+    reload(contrib.surround_analysis_new_cleaned)
+    s =  normalize_path.prefix
+    exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
+    from topo.analysis.featureresponses import FeatureResponses , PatternPresenter, FeatureMaps
+    PatternPresenter.duration=4.0
+    normalize_path.prefix = s
+    save_plotgroup("Orientation Preference and Complexity")
+
+    contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").analyse([__main__.__dict__.get("coords",(0,0))],__main__.__dict__.get("number_sizes",15),absolute=False)
+
