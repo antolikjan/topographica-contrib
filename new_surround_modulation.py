@@ -25,8 +25,8 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/home/jan/DATA/LESI/CCLESISM_CCLESI24_A0_5thTake/OUT/'
-prefix_out = '/home/jan/DATA/LESI/CCLESISM_CCLESI24_A0_5thTake/OUT/out'
+prefix = '/home/jan/DATA/LESI/CCLESISM_CCLESI28_A2/OUT/'
+prefix_out = '/home/jan/DATA/LESI/CCLESISM_CCLESI28_A2/OUT/out'
 
 normalize_path.prefix = prefix_out
 
@@ -90,7 +90,7 @@ class SurroundModulationPlotting():
         self.recalculate_size_tuning_measures()
         
         print "Number of measured neurons: " , len(self.data_dict.keys())
-        if False:
+        if True:
             self.lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
             f = open(prefix_out+'/lhi2.0.pickle','wb')            
             pickle.dump(self.lhi,f)
@@ -98,6 +98,7 @@ class SurroundModulationPlotting():
         else:        
             f = open(prefix_out+'/lhi2.0.pickle','rb')            
             self.lhi = pickle.load(f)
+           
         
         # determine pinwheels and domain centers
         pinwheels = []

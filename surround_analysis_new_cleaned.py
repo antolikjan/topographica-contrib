@@ -126,6 +126,26 @@ class surround_analysis():
         else:
             self.analyse(steps)
             
+    def run_lhi_informed_analysis(self,max_curves=26,center_size=20):
+        self.lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,2.0)                
+        f = open(normalize_path('lhi2.0.pickle'),'wb')            
+        pickle.dump(self.lhi,f)
+        f.close()
+        
+        lhi_center = self.lhi[self.center_r-center_size:self.center_r+center_size,self.center_c-center_size:self.center_c+center_size]
+        steps = []
+        
+        s = numpy.argsort(numpy.ravel(lhi_center))
+        
+        for i in xrange(0,max_curves/2):
+            steps.append(numpy.unravel_index(s[i],lhi_center.shape))
+            steps.append(numpy.unravel_index(s[-(i+1)],lhi_center.shape))
+            print lhi_center[numpy.unravel_index(s[i],lhi_center.shape)]
+            print lhi_center[numpy.unravel_index(s[-(i+1)],lhi_center.shape)]
+            
+        self.analyse(steps)
+        
+            
     def analyse(self,cords,ns=10,absolute=True):
         for (xindex,yindex) in cords:
 		if absolute==False:
