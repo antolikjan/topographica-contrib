@@ -5,6 +5,7 @@ import scipy.stats
 import os.path
 import os
 import copy
+import pickle
 import param
 from math import pi, sqrt, exp, pow
 from topo.plotting.plotfilesaver import * 
@@ -138,10 +139,13 @@ class surround_analysis():
         s = numpy.argsort(numpy.ravel(lhi_center))
         
         for i in xrange(0,max_curves/2):
-            steps.append(numpy.unravel_index(s[i],lhi_center.shape))
-            steps.append(numpy.unravel_index(s[-(i+1)],lhi_center.shape))
-            print lhi_center[numpy.unravel_index(s[i],lhi_center.shape)]
-            print lhi_center[numpy.unravel_index(s[-(i+1)],lhi_center.shape)]
+  	    (x,y) = numpy.unravel_index(s[i],lhi_center.shape)
+            steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
+      	    print self.lhi[(x+self.center_r-center_size,y+self.center_c-center_size)]
+
+	    (x,y) = numpy.unravel_index(s[-(i+1)],lhi_center.shape)
+            steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
+            print self.lhi[(x+self.center_r-center_size,y+self.center_c-center_size)]
             
         self.analyse(steps)
         
