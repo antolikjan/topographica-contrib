@@ -25,15 +25,15 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/home/jan/DATA/LESI/CCLESISM_CCLESI28_A2/OUT/'
-prefix_out = '/home/jan/DATA/LESI/CCLESISM_CCLESI28_A2/OUT/out'
+prefix = '/home/jan/DATA/LESI/CCLESISM_CCLESI33_A4_HC=210/OUT/'
+prefix_out = '/home/jan/DATA/LESI/CCLESISM_CCLESI33_A4_HC=210/OUT/out'
 
 normalize_path.prefix = prefix_out
 
 
 def release_fig(filename=None):
     fullname=filename+".png"
-    pylab.savefig(normalize_path(fullname),dpi=100)
+    pylab.savefig(prefix_out + '/'  + fullname,dpi=100)
 
 
 def disable_top_right_axis(ax):
@@ -74,7 +74,7 @@ def remove_y_tick_labels():
 class SurroundModulationPlotting():
 
     low_contrast=100
-    high_contrast=200
+    high_contrast=210
     
     def __init__(self):
         import pylab
@@ -114,13 +114,10 @@ class SurroundModulationPlotting():
         self.plot_fullfield_optimal_or_pref_correlation(pinwheels)
         self.plot_fullfield_optimal_or_pref_correlation(centers)
         
-        print centers
-        print pinwheels
-        
         for coords in self.data_dict.keys():
             xindex,yindex = coords
-            self.plot_size_tunning(xindex,yindex,independent=False)
-            self.plot_orientation_contrast_tuning(xindex,yindex,str(self.lhi[xindex,yindex]),independent=False)
+            #self.plot_size_tunning(xindex,yindex,independent=False)
+            self.plot_orientation_contrast_tuning(xindex,yindex,str(self.lhi[xindex,yindex]) + " "+ str(self.data_dict[(xindex,yindex)]["OCT"]["Contrastsurround = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]),independent=True)
         #return
         #self.plot_histograms_of_measures()
         #print('1')
@@ -136,13 +133,12 @@ class SurroundModulationPlotting():
                 
         raster_plots_lc,raster_plots_hc = self.plot_map_feature_to_surround_modulation_feature_correlations(self.lhi,"Local Homogeneity Index")
         self.correlations_figure(raster_plots_lc)
-        self.plot_map_feature_to_surround_modulation_feature_correlations(self.OS,"OrientationSelectivity")
+        #self.plot_map_feature_to_surround_modulation_feature_correlations(self.OS,"OrientationSelectivity")
         print len(self.data_dict)
         
     def recalculate_orientation_contrast_supression(self):
         for (xindex,yindex) in self.data_dict.keys():
             measurment = self.data_dict[(xindex,yindex)]["OCT"]
-            
             for curve_label in measurment.keys():
                 if curve_label != 'ORTC':
                     z = measurment['ORTC']['data']
@@ -355,7 +351,7 @@ class SurroundModulationPlotting():
             #ax.set_ylim(0.1,m)
             pylab.show()
             if independent:
-                release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "] " + str(self.data_dict[(xindex,yindex)]["OCT"]['Contrastsurround = 20%']["measures"]["or_suppression"]) + " " + string)
+                release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "] " + string)
             
 
     def plot_average_size_tuning_curve(self,independent=True):
