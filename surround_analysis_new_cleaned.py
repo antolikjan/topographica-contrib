@@ -139,11 +139,11 @@ class surround_analysis():
         s = numpy.argsort(numpy.ravel(lhi_center))
         
         for i in xrange(0,max_curves/2):
-  	    (x,y) = numpy.unravel_index(s[i],lhi_center.shape)
+            (x,y) = numpy.unravel_index(s[i],lhi_center.shape)
             steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
-      	    print self.lhi[(x+self.center_r-center_size,y+self.center_c-center_size)]
+            print self.lhi[(x+self.center_r-center_size,y+self.center_c-center_size)]
 
-	    (x,y) = numpy.unravel_index(s[-(i+1)],lhi_center.shape)
+            (x,y) = numpy.unravel_index(s[-(i+1)],lhi_center.shape)
             steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
             print self.lhi[(x+self.center_r-center_size,y+self.center_c-center_size)]
             
