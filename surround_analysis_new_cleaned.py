@@ -127,7 +127,7 @@ class surround_analysis():
         else:
             self.analyse(steps)
             
-    def run_lhi_informed_analysis(self,max_curves=26,center_size=20):
+    def run_lhi_informed_analysis(self,max_curves=26,center_size=20,index=None):
         self.lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,2.0)                
         f = open(normalize_path('lhi2.0.pickle'),'wb')            
         pickle.dump(self.lhi,f)
@@ -136,16 +136,27 @@ class surround_analysis():
         lhi_center = self.lhi[self.center_r-center_size:self.center_r+center_size,self.center_c-center_size:self.center_c+center_size]
         steps = []
         
-        s = numpy.argsort(numpy.ravel(lhi_center))
+        pinwheels = numpy.random.permutation(numpy.nonzero(lhi_center < 0.3)[0])
+        domains = numpy.random.permutation(numpy.nonzero(lhi_center < 0.7)[0])
         
-        for i in xrange(0,max_curves/2):
-            (x,y) = numpy.unravel_index(s[i],lhi_center.shape)
-            steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
-            print self.lhi[(x+self.center_r-center_size,y+self.center_c-center_size)]
+        #s = numpy.argsort(numpy.ravel(lhi_center))
+        
+        if index == None:
+           for i in xrange(0,max_curves/2):
+                #(x,y) = numpy.unravel_index(s[i],lhi_center.shape)
+                (x,y) = numpy.unravel_index(pinwheels[i],lhi_center.shape)
+                steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
 
-            (x,y) = numpy.unravel_index(s[-(i+1)],lhi_center.shape)
-            steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
-            print self.lhi[(x+self.center_r-center_size,y+self.center_c-center_size)]
+                #(x,y) = numpy.unravel_index(s[-(i+1)],lhi_center.shape)
+                (x,y) = numpy.unravel_index(domains[i],lhi_center.shape)
+                steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
+        else:
+                if (index % 2) == 0:
+                   (x,y) = numpy.unravel_index(pinwheels[i/2],lhi_center.shape)
+                   steps= [(x+self.center_r-center_size,y+self.center_c-center_size)]
+                else:
+                   (x,y) = numpy.unravel_index(domains[i/2],lhi_center.shape)
+                   steps= [(x+self.center_r-center_size,y+self.center_c-center_size)] 
             
         self.analyse(steps)
         
