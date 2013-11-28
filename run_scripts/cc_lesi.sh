@@ -592,7 +592,7 @@ arguments=(
 )
 
 
-args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("/exports/home/v1jantol/go_new/topographica/contrib/cc_lesi_final.ty",analysis_fn=contrib.jaanalysis.complex_surround_analysis_function,output_directory="/exports/home/v1jantol/go_new/RESULTS/CCLESI38/",times=[10000],snapshot=False,dirname_prefix='
+args='import matplotlib; matplotlib.use("Agg"); from topo.command import run_batch ; import contrib.jaanalysis; run_batch("/exports/home/v1jantol/go_new/topographica/contrib/cc_lesi_final.ty",analysis_fn=contrib.jaanalysis.complex_surround_analysis_function,output_directory="/exports/home/v1jantol/go_new/RESULTS/CCLESI39/",times=[10000],snapshot=False,dirname_prefix='
 
 a="$args 'A$1', $argsprefix ${arguments[$1]}  )"
 echo "${a}"
