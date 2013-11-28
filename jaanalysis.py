@@ -473,6 +473,7 @@ def sa():
     PatternPresenter.duration=4.0
     normalize_path.prefix = s
     save_plotgroup("Orientation Preference and Complexity")
-
-    contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").analyse([__main__.__dict__.get("coords",(0,0))],__main__.__dict__.get("number_sizes",15),absolute=False)
+    
+    contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").run_lhi_informed_analysis(max_curves=__main__.__dict__.get("max_curves",20),center_size=__main__.__dict__.get("center_size",20),index=__main__.__dict__.get("index",0))
+    #contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").analyse([__main__.__dict__.get("coords",(0,0))],__main__.__dict__.get("number_sizes",15),absolute=False)
 

@@ -136,8 +136,8 @@ class surround_analysis():
         lhi_center = self.lhi[self.center_r-center_size:self.center_r+center_size,self.center_c-center_size:self.center_c+center_size]
         steps = []
         
-        pinwheels = numpy.random.permutation(numpy.nonzero(lhi_center < 0.3)[0])
-        domains = numpy.random.permutation(numpy.nonzero(lhi_center < 0.7)[0])
+        pinwheels = numpy.random.permutation(numpy.nonzero(numpy.ravel(lhi_center) < 0.3)[0])
+        domains = numpy.random.permutation(numpy.nonzero(numpy.ravel(lhi_center) > 0.7)[0])
         
         #s = numpy.argsort(numpy.ravel(lhi_center))
         
@@ -152,10 +152,10 @@ class surround_analysis():
                 steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
         else:
                 if (index % 2) == 0:
-                   (x,y) = numpy.unravel_index(pinwheels[i/2],lhi_center.shape)
+                   (x,y) = numpy.unravel_index(pinwheels[int(index/2)],lhi_center.shape)
                    steps= [(x+self.center_r-center_size,y+self.center_c-center_size)]
                 else:
-                   (x,y) = numpy.unravel_index(domains[i/2],lhi_center.shape)
+                   (x,y) = numpy.unravel_index(domains[int(index/2)],lhi_center.shape)
                    steps= [(x+self.center_r-center_size,y+self.center_c-center_size)] 
             
         self.analyse(steps)
