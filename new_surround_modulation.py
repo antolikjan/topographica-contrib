@@ -25,8 +25,8 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/media/DATA/LESI/CCLESISM_CCLESI37_A4_HC=210/OUT/'
-prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI37_A4_HC=210/OUT/out'
+prefix = '/media/DATA/LESI/CCLESISM_CCLESI37_A4_HC=200_NS=10/OUT/'
+prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI37_A4_HC=200_NS=10/OUT/out'
 
 normalize_path.prefix = prefix_out
 
@@ -74,7 +74,7 @@ def remove_y_tick_labels():
 class SurroundModulationPlotting():
 
     low_contrast=110
-    high_contrast=210
+    high_contrast=200
     
     def __init__(self):
         import pylab
