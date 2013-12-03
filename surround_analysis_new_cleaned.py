@@ -139,6 +139,8 @@ class surround_analysis():
         pinwheels = numpy.random.permutation(numpy.nonzero(numpy.ravel(lhi_center) < 0.3)[0])
         domains = numpy.random.permutation(numpy.nonzero(numpy.ravel(lhi_center) > 0.7)[0])
         
+	assert len(pinwheels) > max_curves/2
+
         #s = numpy.argsort(numpy.ravel(lhi_center))
         
         if index == None:
