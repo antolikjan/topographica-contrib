@@ -145,11 +145,9 @@ class surround_analysis():
         
         if index == None:
            for i in xrange(0,max_curves/2):
-                #(x,y) = numpy.unravel_index(s[i],lhi_center.shape)
                 (x,y) = numpy.unravel_index(pinwheels[i],lhi_center.shape)
                 steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
 
-                #(x,y) = numpy.unravel_index(s[-(i+1)],lhi_center.shape)
                 (x,y) = numpy.unravel_index(domains[i],lhi_center.shape)
                 steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
         else:
@@ -191,7 +189,7 @@ class surround_analysis():
         self.plot_average_oct(independent=True)
         self.plot_average_size_tuning_curve(independent=True)
         
-        if True:
+        if False:
             self.lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,2.0)                
             f = open(normalize_path('lhi2.0.pickle'),'wb')            
             pickle.dump(self.lhi,f)
