@@ -13,10 +13,11 @@ from topo.command.pylabplot import cyclic_tuning_curve, matrixplot
 from topo.command.analysis import save_plotgroup
 from matplotlib.ticker import MaxNLocator
 from param import normalize_path
-from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter
+from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, FeatureCurveCommand, UnitCurveCommand, SinusoidalMeasureResponseCommand,PatternPresenter, FeatureResponses
 import matplotlib.gridspec as gridspec
 from matplotlib import rc
 import topo
+from numpy.random import RandomState
 
 #rc('text', usetex=True)
 rc('mathtext',default='regular')
@@ -110,6 +111,7 @@ class surround_analysis():
             SinusoidalMeasureResponseCommand.scale=1.0
             MeasureResponseCommand.scale=1.0
             FeatureCurveCommand.num_orientation=12
+            FeatureResponses.repetitions = __main__.__dict__.get('repetitions',1)
             
             self.OR = topo.sim["V1Complex"].sheet_views['OrientationPreference'].view()[0]
             self.OS = topo.sim["V1Complex"].sheet_views['OrientationSelectivity'].view()[0]
@@ -136,8 +138,10 @@ class surround_analysis():
         lhi_center = self.lhi[self.center_r-center_size:self.center_r+center_size,self.center_c-center_size:self.center_c+center_size]
         steps = []
         
-        pinwheels = numpy.random.permutation(numpy.nonzero(numpy.ravel(lhi_center) < 0.3)[0])
-        domains = numpy.random.permutation(numpy.nonzero(numpy.ravel(lhi_center) > 0.7)[0])
+        r = RandomState(1023)
+        
+        pinwheels = r.permutation(numpy.nonzero(numpy.ravel(lhi_center) < 0.3)[0])
+        domains = r.permutation(numpy.nonzero(numpy.ravel(lhi_center) > 0.7)[0])
         
 	assert len(pinwheels) > max_curves/2
 
