@@ -25,8 +25,8 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/media/DATA/LESI/CCLESISM_CCLESI37_A4_HC=200_NS=10/OUT/'
-prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI37_A4_HC=200_NS=10/OUT/out'
+prefix = '/media/DATA/LESI/CCLESISM_CCLESI48_A8_HC=250_LimSurr=True/OUT/'
+prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI48_A8_HC=250_LimSurr=True/OUT/out'
 
 normalize_path.prefix = prefix_out
 
@@ -74,7 +74,7 @@ def remove_y_tick_labels():
 class SurroundModulationPlotting():
 
     low_contrast=110
-    high_contrast=200
+    high_contrast=250
     
     def __init__(self):
         import pylab
@@ -90,7 +90,7 @@ class SurroundModulationPlotting():
         self.recalculate_size_tuning_measures()
         
         print "Number of measured neurons: " , len(self.data_dict.keys())
-        if True:
+        if False:
             self.lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
             f = open(prefix_out+'/lhi2.0.pickle','wb')            
             pickle.dump(self.lhi,f)
@@ -137,25 +137,36 @@ class SurroundModulationPlotting():
         print len(self.data_dict)
         
     def recalculate_orientation_contrast_supression(self):
+        hc_curve_name = "Contrast = " + str(self.high_contrast) + "%";
+        
         for (xindex,yindex) in self.data_dict.keys():
             measurment = self.data_dict[(xindex,yindex)]["OCT"]
             for curve_label in measurment.keys():
                 if curve_label != 'ORTC':
-                    z = measurment['ORTC']['data']
-                    ar = []
-                    ors = []
-                    for o in sorted(z.keys()):
-                        ar.append(z[o].view()[0][xindex][yindex])
-                        ors.append(o)
-                    peak_or_response = max(ar)
-                    assert ors[numpy.argmax(ar)] == measurment["ORTC"]["info"]["pref_or"]
-
+                    if True:
+                        z = measurment['ORTC']['data']
+                        ar = []
+                        ors = []
+                        for o in sorted(z.keys()):
+                            ar.append(z[o].view()[0][xindex][yindex])
+                            ors.append(o)
+                        peak_or_response = max(ar)
+                        assert ors[numpy.argmax(ar)] == measurment["ORTC"]["info"]["pref_or"]
+                        
+                        #curve = self.data_dict[(xindex,yindex)]["ST"][hc_curve_name]["data"]
+                        #assert peak_or_response == [curve[key].view()[0][xindex, yindex] for key in curve.keys()][self.data_dict[(xindex,yindex)]["ST"][hc_curve_name]["measures"]["peak_supression_index"]]
+                    else:
+                        curve = self.data_dict[(xindex,yindex)]["ST"][hc_curve_name]["data"]
+                        x_values = sorted(curve.keys())
+                        y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
+                        peak_or_response = y_values[self.data_dict[(xindex,yindex)]["ST"][hc_curve_name]["measures"]["peak_near_facilitation_index"]]
+                        
                     
                     curve =  measurment[curve_label]["data"]
                     orr = measurment["ORTC"]["info"]["pref_or"]
                	    surr_ors =  numpy.array(curve.keys())
-                    orr_ort = surr_ors[numpy.argmin(numpy.abs(surr_ors - orr - numpy.pi/2.0))]
-                    orr = surr_ors[numpy.argmin(numpy.abs(surr_ors - orr))]
+                    orr_ort = surr_ors[numpy.argmin(numpy.abs((surr_ors - orr - numpy.pi/2.0) % numpy.pi/2.0))]
+                    orr = surr_ors[numpy.argmin(numpy.abs((surr_ors - orr)% numpy.pi/2.0))]
                     
                     pref_or_resp=curve[orr].view()[0][xindex][yindex]
                     cont_or_resp=curve[orr_ort].view()[0][xindex][yindex]
@@ -164,6 +175,14 @@ class SurroundModulationPlotting():
                         measurment[curve_label]["measures"]["or_suppression"]=(cont_or_resp-pref_or_resp)/peak_or_response
                     else: 
                         measurment[curve_label]["measures"]["or_suppression"]=0.0
+                    
+                    #if measurment[curve_label]["measures"]["or_suppression"] > 3.0:
+                    #   measurment[curve_label]["measures"]["or_suppression"] = 3
+                    
+                    #if measurment[curve_label]["measures"]["or_suppression"] < -3.0:
+                    #   measurment[curve_label]["measures"]["or_suppression"] = -3
+                    
+                    
     
     def plot_fullfield_optimal_or_pref_correlation(self,coords):
         optimal = []
@@ -349,7 +368,7 @@ class SurroundModulationPlotting():
             ax.set_yticks([0.1,m/2,m])
             ax.set_yticklabels(ax.get_yticks(), fontProperties)
             #ax.set_ylim(0.1,m)
-            pylab.show()
+            #pylab.show()
             if independent:
                 release_fig("OCTC[" + str(xindex) + "," + str(yindex) + "] " + string)
             
@@ -436,10 +455,11 @@ class SurroundModulationPlotting():
           curve =  self.data_dict[k]["OCT"]["ORTC"]["data"]
           x_values = sorted(curve.keys())
           m = numpy.max([curve[l].view()[0][xindex, yindex] for l in x_values])
+          
+          orientation = self.data_dict[(xindex,yindex)]["OCT"]["ORTC"]["info"]["pref_or"]
             
           for curve_label in self.data_dict[k]["OCT"].keys():
               if curve_label != 'Contrastsurround = 100%':                
-                  orientation = self.data_dict[(xindex,yindex)]["OCT"]["ORTC"]["info"]["pref_or"]
                   curve =  self.data_dict[k]["OCT"][curve_label]["data"]
                   x_values = sorted(curve.keys())
                   y_values = [curve[l].view()[0][xindex, yindex] for l in x_values]
@@ -933,7 +953,7 @@ class SurroundModulationPlotting():
         pylab.xlabel('OR map')
         
         pylab.subplot(2,1,2)
-        pylab.imshow(scipy.signal.correlate2d(ormap,ormap),cmap='autumn')
+        pylab.imshow    (scipy.signal.correlate2d(ormap,ormap),cmap='autumn')
         pylab.axis('off')
         pylab.xlabel('Autocorrelation')
         
