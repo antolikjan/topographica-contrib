@@ -25,8 +25,8 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/media/DATA/LESI/CCLESISM_CCLESI48_A8_HC=250_LimSurr=True/OUT/'
-prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI48_A8_HC=250_LimSurr=True/OUT/out'
+prefix = '/media/DATA/LESI/CCLESISM_CCLESI52_A1_HC=230_LimSurr=True/OUT/'
+prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI52_A1_HC=230_LimSurr=True/OUT/out'
 
 normalize_path.prefix = prefix_out
 
@@ -74,7 +74,7 @@ def remove_y_tick_labels():
 class SurroundModulationPlotting():
 
     low_contrast=110
-    high_contrast=250
+    high_contrast=230
     
     def __init__(self):
         import pylab
@@ -108,7 +108,7 @@ class SurroundModulationPlotting():
                pinwheels.append(coords) 
             if self.lhi[coords] > 0.5:
                centers.append(coords) 
-               
+        self.plot_average_size_tuning_curve(independent=True)
         self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
         self.plot_average_oct(keys=centers,independent=True,string="domains")
         self.plot_fullfield_optimal_or_pref_correlation(pinwheels)
@@ -116,7 +116,7 @@ class SurroundModulationPlotting():
         
         for coords in self.data_dict.keys():
             xindex,yindex = coords
-            #self.plot_size_tunning(xindex,yindex,independent=False)
+            self.plot_size_tunning(xindex,yindex,independent=False)
             self.plot_orientation_contrast_tuning(xindex,yindex,str(self.lhi[xindex,yindex]) + " "+ str(self.data_dict[(xindex,yindex)]["OCT"]["Contrastsurround = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]),independent=True)
         #return
         #self.plot_histograms_of_measures()
@@ -237,7 +237,7 @@ class SurroundModulationPlotting():
         measurment = self.data_dict[(xindex,yindex)]["ST"]
         
         i = 0
-        m = 0
+        #m = 0
         for curve_label in measurment.keys():
             curve =  measurment[curve_label]["data"]
             x_values = sorted(curve.keys())
