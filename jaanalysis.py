@@ -86,7 +86,8 @@ def complex_analysis_function():
     #topo.sim["V1Simple"].output_fns[1].generator.scale=0.0
     a = topo.sim["V1Complex"].in_connections[0].strength
     
-    #SinusoidalMeasureResponseCommand.scale=__main__.__dict__.get("analysis_scale",0.35)
+    SinusoidalMeasureResponseCommand.scale=__main__.__dict__.get("analysis_scale",0.35)
+    MeasureResponseCommand.scale=__main__.__dict__.get("analysis_scale",0.35)
 
 
     #if((float(topo.sim.time()) >= 5003.0) and (float(topo.sim.time()) < 5004.0)): 

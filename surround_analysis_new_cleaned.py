@@ -108,10 +108,12 @@ class surround_analysis():
             FeatureCurveCommand.sheet=topo.sim[sheet_name]
             SinusoidalMeasureResponseCommand.num_phase=8
             SinusoidalMeasureResponseCommand.frequencies=[__main__.__dict__.get('FREQ',2.4)]
-            SinusoidalMeasureResponseCommand.scale=1.0
-            MeasureResponseCommand.scale=1.0
+            SinusoidalMeasureResponseCommand.scale=self.high_contrast/100.0
+            MeasureResponseCommand.scale=self.high_contrast/100.0
             FeatureCurveCommand.num_orientation=12
             FeatureResponses.repetitions = __main__.__dict__.get('repetitions',1)
+            
+            topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1Complex"])()
             
             self.OR = topo.sim["V1Complex"].sheet_views['OrientationPreference'].view()[0]
             self.OS = topo.sim["V1Complex"].sheet_views['OrientationSelectivity'].view()[0]
