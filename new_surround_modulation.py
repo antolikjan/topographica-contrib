@@ -25,8 +25,8 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/media/DATA/LESI/CCLESISM_CCLESI52_A1_HC=230_LimSurr=True/OUT/'
-prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI52_A1_HC=230_LimSurr=True/OUT/out'
+prefix = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=230_LimSurr=True_duration=4.0_number_sizes=25/OUT/'
+prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=230_LimSurr=True_duration=4.0_number_sizes=25/OUT/out'
 
 normalize_path.prefix = prefix_out
 
@@ -90,7 +90,7 @@ class SurroundModulationPlotting():
         self.recalculate_size_tuning_measures()
         
         print "Number of measured neurons: " , len(self.data_dict.keys())
-        if False:
+        if False    :
             self.lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
             f = open(prefix_out+'/lhi2.0.pickle','wb')            
             pickle.dump(self.lhi,f)
@@ -245,7 +245,7 @@ class SurroundModulationPlotting():
             
             pylab.plot(x_values, y_values, lw=3, color=colors[i],label=curve_label)
             
-            m = max(m,max(y_values))
+            m = max(0,max(y_values))
                 
             pylab.annotate('', xy=(measurment[curve_label]["measures"]["peak_near_facilitation"], y_values[measurment[curve_label]["measures"]["peak_near_facilitation_index"]]), xycoords='data',
             xytext=(-1, 20), textcoords='offset points', arrowprops=dict(facecolor='green', shrink=0.05))
