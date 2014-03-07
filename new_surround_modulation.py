@@ -25,8 +25,8 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=230_LimSurr=True_duration=4.0_number_sizes=25/OUT/'
-prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=230_LimSurr=True_duration=4.0_number_sizes=25/OUT/out'
+prefix = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=230_LimSurr=True_duration=4.0_LHI=2.0_uniform=True_center_size=20_Max=False/OUT/'
+prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=230_LimSurr=True_duration=4.0_LHI=2.0_uniform=True_center_size=20_Max=False/OUT/out2.0'
 
 normalize_path.prefix = prefix_out
 
@@ -84,13 +84,14 @@ class SurroundModulationPlotting():
         (self.OR,self.OS,self.MR,self.data_dict) = pickle.load(f)
         f.close()
         
+        #self.OR = self.data_dict.OR
         #self.calculate_autocorrelation(self.OR)
         
         self.recalculate_orientation_contrast_supression()
         self.recalculate_size_tuning_measures()
         
         print "Number of measured neurons: " , len(self.data_dict.keys())
-        if False    :
+        if True:
             self.lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
             f = open(prefix_out+'/lhi2.0.pickle','wb')            
             pickle.dump(self.lhi,f)
@@ -98,16 +99,23 @@ class SurroundModulationPlotting():
         else:        
             f = open(prefix_out+'/lhi2.0.pickle','rb')            
             self.lhi = pickle.load(f)
-           
         
         # determine pinwheels and domain centers
         pinwheels = []
         centers = []
+        or_sup_pinwheels = 0
+        or_sup_domains = 0
         for coords in self.data_dict.keys():    
             if self.lhi[coords] < 0.5:
                pinwheels.append(coords) 
+               or_sup_pinwheels += self.data_dict[coords]['OCT']['Contrastsurround' + " = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]
             if self.lhi[coords] > 0.5:
+               or_sup_domains += self.data_dict[coords]['OCT']['Contrastsurround' + " = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]
                centers.append(coords) 
+        
+        print or_sup_pinwheels/len(pinwheels)
+        print or_sup_domains/len(centers)
+        #0/0
         self.plot_average_size_tuning_curve(independent=True)
         self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
         self.plot_average_oct(keys=centers,independent=True,string="domains")
@@ -143,7 +151,12 @@ class SurroundModulationPlotting():
             measurment = self.data_dict[(xindex,yindex)]["OCT"]
             for curve_label in measurment.keys():
                 if curve_label != 'ORTC':
+                    
                     if True:
+                        z = measurment['ORTC']['data']
+                        peak_or_response = z[measurment["ORTC"]["info"]["pref_or"]].view()[0][xindex][yindex]
+                        
+                    if False:
                         z = measurment['ORTC']['data']
                         ar = []
                         ors = []
@@ -155,7 +168,8 @@ class SurroundModulationPlotting():
                         
                         #curve = self.data_dict[(xindex,yindex)]["ST"][hc_curve_name]["data"]
                         #assert peak_or_response == [curve[key].view()[0][xindex, yindex] for key in curve.keys()][self.data_dict[(xindex,yindex)]["ST"][hc_curve_name]["measures"]["peak_supression_index"]]
-                    else:
+                    
+                    if False:
                         curve = self.data_dict[(xindex,yindex)]["ST"][hc_curve_name]["data"]
                         x_values = sorted(curve.keys())
                         y_values = [curve[key].view()[0][xindex, yindex] for key in x_values]
@@ -164,23 +178,25 @@ class SurroundModulationPlotting():
                     
                     curve =  measurment[curve_label]["data"]
                     orr = measurment["ORTC"]["info"]["pref_or"]
+                    #orr = self.OR[xindex,yindex]*numpy.pi
                	    surr_ors =  numpy.array(curve.keys())
-                    orr_ort = surr_ors[numpy.argmin(numpy.abs((surr_ors - orr - numpy.pi/2.0) % numpy.pi/2.0))]
+                    #orr_ort = orr + numpy.pi/2.0 
                     orr = surr_ors[numpy.argmin(numpy.abs((surr_ors - orr)% numpy.pi/2.0))]
+                    orr_ort = surr_ors[numpy.argmin(numpy.abs((surr_ors - orr - numpy.pi/2.0) % numpy.pi/2.0))]
                     
-                    pref_or_resp=curve[orr].view()[0][xindex][yindex]
                     cont_or_resp=curve[orr_ort].view()[0][xindex][yindex]
+                    pref_or_resp=curve[orr].view()[0][xindex][yindex]
                     
                     if peak_or_response != 0:
                         measurment[curve_label]["measures"]["or_suppression"]=(cont_or_resp-pref_or_resp)/peak_or_response
                     else: 
                         measurment[curve_label]["measures"]["or_suppression"]=0.0
                     
-                    #if measurment[curve_label]["measures"]["or_suppression"] > 3.0:
-                    #   measurment[curve_label]["measures"]["or_suppression"] = 3
+                    #if measurment[curve_label]["measures"]["or_suppression"] > 1.0:
+                    #   measurment[curve_label]["measures"]["or_suppression"] = 1
                     
-                    #if measurment[curve_label]["measures"]["or_suppression"] < -3.0:
-                    #   measurment[curve_label]["measures"]["or_suppression"] = -3
+                    #if measurment[curve_label]["measures"]["or_suppression"] < -1.0:
+                    #   measurment[curve_label]["measures"]["or_suppression"] = -1
                     
                     
     
@@ -887,10 +903,8 @@ class SurroundModulationPlotting():
                     else:
                        curve_label = "Contrastsurround" 
                     
-                    
                     if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.high_contrast) + "%"):
                         for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"].keys():
-                            print measure_name
                             if not raster_plots_hc.has_key(measure_name):
                                 raster_plots_hc[measure_name]=[[],[]]    
                             raster_plots_hc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.high_contrast) + "%"]["measures"][measure_name])
@@ -898,7 +912,6 @@ class SurroundModulationPlotting():
                     
                     if self.data_dict[(xcoord,ycoord)][curve_type].has_key(curve_label + " = " + str(self.low_contrast) + "%"):
                         for measure_name in self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = " + str(self.low_contrast) + "%"]["measures"].keys():
-                            print measure_name
                             if not raster_plots_lc.has_key(measure_name):
                                 raster_plots_lc[measure_name]=[[],[]]    
                             raster_plots_lc[measure_name][0].append(self.data_dict[(xcoord,ycoord)][curve_type][curve_label + " = "  + str(self.low_contrast) + "%"]["measures"][measure_name])
