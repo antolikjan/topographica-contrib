@@ -5,7 +5,7 @@ import pylab
 import os.path
 import os
 import copy
-import pdb
+#import pdb
 
 import param
 
@@ -577,6 +577,7 @@ SimpleHomeoLinearRelative = topo.transferfn.misc.HomeostaticResponse
 def _divide_with_constant(x, y):
     y = numpy.clip(y, 0, 10000)
     x = numpy.clip(x, 0, 10000)
+    print __main__.__dict__.get('LGNGain',0.11)
     return numpy.divide(x, y + __main__.__dict__.get('LGNGain',0.11))
 
 def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):

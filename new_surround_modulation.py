@@ -25,10 +25,16 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=230_LimSurr=True_duration=4.0_LHI=2.0_uniform=True_center_size=20_Max=False/OUT/'
-prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=230_LimSurr=True_duration=4.0_LHI=2.0_uniform=True_center_size=20_Max=False/OUT/out2.0'
+prefix = '/media/DATA/LESI/CCLESISM_CCLESI54_A0_HC=150_LimSurr=True_duration=4.0_LHI=2.0_uniform=True_center_size=20_Max=False_num_sizes=20_LC=90/OUT/'
+prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI54_A0_HC=150_LimSurr=True_duration=4.0_LHI=2.0_uniform=True_center_size=20_Max=False_num_sizes=20_LC=90/OUT/out2.0'
 
 normalize_path.prefix = prefix_out
+
+def circular_dist(a, b, period):
+    """
+    Returns the distance between a and b (scalars) in a domain with `period` period.
+    """
+    return  numpy.minimum(numpy.abs(a - b), period - numpy.abs(a - b))
 
 
 def release_fig(filename=None):
@@ -73,8 +79,8 @@ def remove_y_tick_labels():
 
 class SurroundModulationPlotting():
 
-    low_contrast=110
-    high_contrast=230
+    low_contrast=100
+    high_contrast=150
     
     def __init__(self):
         import pylab
@@ -91,7 +97,7 @@ class SurroundModulationPlotting():
         self.recalculate_size_tuning_measures()
         
         print "Number of measured neurons: " , len(self.data_dict.keys())
-        if True:
+        if False:
             self.lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
             f = open(prefix_out+'/lhi2.0.pickle','wb')            
             pickle.dump(self.lhi,f)
@@ -106,16 +112,16 @@ class SurroundModulationPlotting():
         or_sup_pinwheels = 0
         or_sup_domains = 0
         for coords in self.data_dict.keys():    
-            if self.lhi[coords] < 0.5:
+            if self.lhi[coords] < 0.3:
                pinwheels.append(coords) 
                or_sup_pinwheels += self.data_dict[coords]['OCT']['Contrastsurround' + " = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]
-            if self.lhi[coords] > 0.5:
+            if self.lhi[coords] > 0.7:
                or_sup_domains += self.data_dict[coords]['OCT']['Contrastsurround' + " = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]
                centers.append(coords) 
         
         print or_sup_pinwheels/len(pinwheels)
         print or_sup_domains/len(centers)
-        #0/0
+        
         self.plot_average_size_tuning_curve(independent=True)
         self.plot_average_oct(keys=pinwheels,independent=True,string="pinwheels")
         self.plot_average_oct(keys=centers,independent=True,string="domains")
@@ -124,7 +130,7 @@ class SurroundModulationPlotting():
         
         for coords in self.data_dict.keys():
             xindex,yindex = coords
-            self.plot_size_tunning(xindex,yindex,independent=False)
+            #self.plot_size_tunning(xindex,yindex,independent=False)
             self.plot_orientation_contrast_tuning(xindex,yindex,str(self.lhi[xindex,yindex]) + " "+ str(self.data_dict[(xindex,yindex)]["OCT"]["Contrastsurround = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]),independent=True)
         #return
         #self.plot_histograms_of_measures()
@@ -153,8 +159,7 @@ class SurroundModulationPlotting():
                 if curve_label != 'ORTC':
                     
                     if True:
-                        z = measurment['ORTC']['data']
-                        peak_or_response = z[measurment["ORTC"]["info"]["pref_or"]].view()[0][xindex][yindex]
+                        peak_or_response = measurment['ORTC']['data'][measurment["ORTC"]["info"]["pref_or"]].view()[0][xindex][yindex]
                         
                     if False:
                         z = measurment['ORTC']['data']
@@ -181,8 +186,8 @@ class SurroundModulationPlotting():
                     #orr = self.OR[xindex,yindex]*numpy.pi
                	    surr_ors =  numpy.array(curve.keys())
                     #orr_ort = orr + numpy.pi/2.0 
-                    orr = surr_ors[numpy.argmin(numpy.abs((surr_ors - orr)% numpy.pi/2.0))]
-                    orr_ort = surr_ors[numpy.argmin(numpy.abs((surr_ors - orr - numpy.pi/2.0) % numpy.pi/2.0))]
+                    orr = surr_ors[numpy.argmin(circular_dist(surr_ors % numpy.pi,orr % numpy.pi, numpy.pi))]
+                    orr_ort = surr_ors[numpy.argmin(circular_dist(surr_ors % numpy.pi,(orr + numpy.pi/2) % numpy.pi, numpy.pi))]
                     
                     cont_or_resp=curve[orr_ort].view()[0][xindex][yindex]
                     pref_or_resp=curve[orr].view()[0][xindex][yindex]
