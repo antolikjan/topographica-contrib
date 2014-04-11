@@ -1,6 +1,7 @@
 import numpy 
 import __main__
 
+
 def t_function():
     """
     Basic example of an analysis command for run_batch; users are
@@ -466,13 +467,22 @@ def sa():
     from param import normalize_path
     import contrib.jacommands
     import contrib.surround_analysis_new_cleaned
+    from topo.analysis.featureresponses import SinusoidalMeasureResponseCommand,FeatureCurveCommand
     reload(contrib.surround_analysis_new_cleaned)
     s =  normalize_path.prefix
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
     from topo.analysis.featureresponses import FeatureResponses , PatternPresenter, FeatureMaps
     PatternPresenter.duration=4.0
     normalize_path.prefix = s
-    save_plotgroup("Orientation Preference and Complexity")
+    SinusoidalMeasureResponseCommand.scale=__main__.__dict__.get("analysis_scale",1.0)
+    SinusoidalMeasureResponseCommand.frequencies=[2.4]
+    
+    if __main__.__dict__.get("Max",False):
+	    from topo.misc.distribution import DSF_MaxValue
+	    preference_fn=DSF_MaxValue(value_scale=(0., 1./numpy.pi),selectivity_scale=(0.,17.0))
+	    topo.command.pylabplot.measure_or_tuning_fullfield.instance(sheet=topo.sim["V1Complex"],preference_fn=preference_fn)()
+    else:        
+	    save_plotgroup("Orientation Preference and Complexity")
     
     contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").run_lhi_informed_analysis(max_curves=__main__.__dict__.get("max_curves",20),center_size=__main__.__dict__.get("center_size",20),index=__main__.__dict__.get("index",0))
     #contrib.surround_analysis_new_cleaned.surround_analysis("V1Complex").analyse([__main__.__dict__.get("coords",(0,0))],__main__.__dict__.get("number_sizes",15),absolute=False)

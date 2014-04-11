@@ -19,6 +19,13 @@ from matplotlib import rc
 import topo
 from numpy.random import RandomState
 
+def circular_dist(a, b, period):
+    """
+    Returns the distance between a and b (scalars) in a domain with `period` period.
+    """
+    return  numpy.minimum(numpy.abs(a - b), period - numpy.abs(a - b))
+
+
 #rc('text', usetex=True)
 rc('mathtext',default='regular')
 pylab.rc(('xtick.major','xtick.minor','ytick.major','ytick.minor'), pad=8)    
@@ -81,12 +88,12 @@ class surround_analysis():
             f.close()
             
             if True:
-                self.lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
-                f = open(normalize_path('lhi2.0.pickle'),'wb')            
+                self.lhi = compute_local_homogeneity_index(self.OR*pi,__main__.__dict__.get('LHI',2.0))    
+                f = open(normalize_path('lhi'+str(__main__.__dict__.get('LHI',2.0))+'.pickle'),'wb')            
                 pickle.dump(self.lhi,f)
                 f.close()
             else:        
-                f = open(normalize_path('lhi2.0.pickle'),'rb')            
+                f = open(normalize_path('lhi'+str(__main__.__dict__.get('LHI',2.0))+'.pickle'),'rb')            
                 self.lhi = pickle.load(f)
         else:
             import topo
@@ -125,13 +132,13 @@ class surround_analysis():
             for j in xrange(0,grid_step_radius*2+1):
                 steps.append([self.center_r+(i-grid_step_radius)*step_size,self.center_c+(j-grid_step_radius)*step_size])
         if max_curves != None:
-            self.analyse(steps[0:max_curves])
+            self.analyse(steps[0:max_curves],ns=__main__.__dict__.get('number_sizes',10))
         else:
-            self.analyse(steps)
+            self.analyse(steps,ns=__main__.__dict__.get('number_sizes',10))
             
     def run_lhi_informed_analysis(self,max_curves=26,center_size=20,index=None):
-        self.lhi = compute_local_homogeneity_index(self.sheet.sheet_views['OrientationPreference'].view()[0]*pi,2.0)                
-        f = open(normalize_path('lhi2.0.pickle'),'wb')            
+	self.lhi = compute_local_homogeneity_index(self.OR*pi,__main__.__dict__.get('LHI',2.0))
+        f = open(normalize_path('lhi'+str(__main__.__dict__.get('LHI',2.0))+'.pickle'),'wb')
         pickle.dump(self.lhi,f)
         f.close()
         
@@ -139,30 +146,47 @@ class surround_analysis():
         steps = []
         
         r = RandomState(1023)
-        
-        pinwheels = r.permutation(numpy.nonzero(numpy.ravel(lhi_center) < 0.3)[0])
-        domains = r.permutation(numpy.nonzero(numpy.ravel(lhi_center) > 0.7)[0])
-        
-	assert len(pinwheels) > max_curves/2
+       
+	if not __main__.__dict__.get('uniform',False):
 
-        #s = numpy.argsort(numpy.ravel(lhi_center))
-        
-        if index == None:
-           for i in xrange(0,max_curves/2):
-                (x,y) = numpy.unravel_index(pinwheels[i],lhi_center.shape)
-                steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
+ 
+	        pinwheels = r.permutation(numpy.nonzero(numpy.ravel(lhi_center) < __main__.__dict__.get('cutoff',0.3))[0])
+        	domains = r.permutation(numpy.nonzero(numpy.ravel(lhi_center) > (1-__main__.__dict__.get('cutoff',0.3)))[0])
+	        
+		assert len(pinwheels) > max_curves/2
 
-                (x,y) = numpy.unravel_index(domains[i],lhi_center.shape)
-                steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
+        	#s = numpy.argsort(numpy.ravel(lhi_center))
+        
+	        if index == None:
+	           for i in xrange(0,max_curves/2):
+        	        (x,y) = numpy.unravel_index(pinwheels[i],lhi_center.shape)
+                	steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
+
+	                (x,y) = numpy.unravel_index(domains[i],lhi_center.shape)
+        	        steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
+	        else:
+                	if (index % 2) == 0:
+        	           (x,y) = numpy.unravel_index(pinwheels[int(index/2)],lhi_center.shape)
+	                   steps= [(x+self.center_r-center_size,y+self.center_c-center_size)]
+        	        else:
+                	   (x,y) = numpy.unravel_index(domains[int(index/2)],lhi_center.shape)
+	                   steps= [(x+self.center_r-center_size,y+self.center_c-center_size)] 
         else:
-                if (index % 2) == 0:
-                   (x,y) = numpy.unravel_index(pinwheels[int(index/2)],lhi_center.shape)
-                   steps= [(x+self.center_r-center_size,y+self.center_c-center_size)]
-                else:
-                   (x,y) = numpy.unravel_index(domains[int(index/2)],lhi_center.shape)
-                   steps= [(x+self.center_r-center_size,y+self.center_c-center_size)] 
-            
-        self.analyse(steps)
+		bins = []
+		for i in xrange(0,10):
+		    a = numpy.ravel(lhi_center) >= i*0.1	
+		    b = numpy.ravel(lhi_center) <  (i+1)*0.1
+		    bins.append(r.permutation(numpy.nonzero(numpy.multiply(a,b))[0]))
+		(x,y) = numpy.unravel_index(bins[index % 10][int(index/10)],lhi_center.shape)
+                steps= [(x+self.center_r-center_size,y+self.center_c-center_size)]
+   
+	    	    					
+
+		#places = r.permutation(numpy.arange(0,len(numpy.ravel(lhi_center)),1))
+                #(x,y) = numpy.unravel_index(places[index],lhi_center.shape)
+                #steps.append((x+self.center_r-center_size,y+self.center_c-center_size))
+
+        self.analyse(steps,ns=__main__.__dict__.get('number_sizes',10))
         
             
     def analyse(self,cords,ns=10,absolute=True):
@@ -247,8 +271,14 @@ class surround_analysis():
             ar.append(self.sheet.curve_dict['orientation'][curve_name_ort][o].view()[0][xindex][yindex])
             ors.append(o)
             
-        peak_or_response = max(ar)
-        orr=ors[numpy.argmax(ar)]
+        #peak_or_response = max(ar)
+	#lets find the weighted average orientation preference
+	o = numpy.angle(numpy.mean(numpy.multiply(numpy.exp(1j*numpy.array(ors)*2),ar)))/2.0 % numpy.pi
+	print o
+	assert (o <= numpy.pi and o >= 0)
+	orr = ors[numpy.argmin(circular_dist(numpy.array(ors) % numpy.pi,o % numpy.pi,numpy.pi))]
+	peak_or_response = ar[ors.index(orr)]
+        #orr=ors[numpy.argmax(ar)]
 
         if __main__.__dict__.get('OrrFullfield',False):
             orr = self.sheet.sheet_views['OrientationPreference'].view()[0][xindex][yindex]*pi
@@ -284,7 +314,7 @@ class surround_analysis():
                                                              thickness=4.0-curve["measures"]["peak_near_facilitation"]-__main__.__dict__.get('SPACE',0.0)-__main__.__dict__.get('INC',0.0),
                                                              duration=__main__.__dict__.get('duration',4.0),
                                                              num_phase=__main__.__dict__.get('NUM_PHASE',8),
-                                 frequencies=[__main__.__dict__.get('FREQ',2.4)],
+				                             frequencies=[__main__.__dict__.get('FREQ',2.4)],
                                                              curve_parameters=[{"contrastsurround":contrast_center}],coords=[(xcoor,ycoor)])
         
 	for curve_label in sorted(self.sheet.curve_dict['orientationsurround'].keys()):
