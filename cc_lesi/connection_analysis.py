@@ -1,6 +1,7 @@
 import numpy
 import topo
 import pickle
+from param import normalize_path
 
 def circular_dist(a,b,period):
     """
@@ -138,7 +139,7 @@ def analyse_connectivity(sheet_name,proj_name,lhi):
     pylab.title('domains')
     
     from param import normalize_path
-    pylab.savefig('PPconnectivity: ' + proj_name + str(topo.sim.time()) + '.png');
+    pylab.savefig(normalize_path('PPconnectivity: ' + proj_name + str(topo.sim.time()) + '.png'));
 
 Analyse_connectivity():
     if True:
