@@ -1,0 +1,126 @@
+"""
+LISSOM-based orientation map with complex cell layer.
+
+$Id: cc_lissom_oo_or.ty 8265 2008-03-26 17:09:15Z antolikjan $
+"""
+__version__='$Revision: 8265 $'
+
+import numpy
+
+from math import pi, sqrt
+
+import param
+
+import topo.pattern
+import topo.pattern.random
+import __main__
+import os
+import contrib
+from topo.sheet import  JointNormalizingCFSheet_Continuous
+from topo.sheet.lissom import LISSOM
+from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
+from topo.sheet import GeneratorSheet, JointNormalizingCFSheet_Continuous
+from topo.projection import CFProjection, SharedWeightCFProjection,OneToOneProjection
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
+from topo.base.cf import CFSheet
+from topo.base.boundingregion import BoundingBox
+from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
+from topo.transferfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.transferfn.misc import PatternCombine
+from topo.transferfn.misc import HalfRectify
+from topo.transferfn.misc import AttributeTrackingTF
+from topo.transferfn import PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt,Sigmoid
+from topo import numbergen
+from topo.pattern import Gaussian
+from topo.learningfn.projfn import CFPLF_Trace
+from topo.base.functionfamily import CoordinateMapperFn
+from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeoSigmoid, Jitterer, AddGC, SimpleHomeoLinear, Expander
+from topo.numbergen import UniformRandom, BoundedNumber, ExponentialDecay
+
+
+topo.sim.name = "CCSimple"
+core_size=locals().get('CS',0.5)
+
+disk_scale=locals().get('diskscale',0.35)
+reg=locals().get('Region',1.0)
+ring = topo.pattern.Composite(bounds=BoundingBox(radius=2*reg),operator=numpy.add,x=numbergen.UniformRandom(lbound=-reg,ubound=reg,seed=13),
+                                    y=numbergen.UniformRandom(lbound=-reg,ubound=reg,seed=26),
+                                    generators=[topo.pattern.Ring(size=1.0, aspect_ratio=1.0, scale=locals().get('RingScale',0.25),thickness=locals().get('Thickness',0.01),
+                                    offset=0.0,
+                                    bounds=BoundingBox(radius=2*reg), smoothing=locals().get('Smoothing',0.03)),
+                                    topo.pattern.random.UniformRandom(seed=13,offset=locals().get('rand_offset',0), scale=locals().get('rand_scale',0.05))])
+
+retinal_waves=Expander(bounds=BoundingBox(radius=2*reg),generator=ring,orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',10),speed=locals().get('Speed',0.02),size=locals().get('InitRingSize',0.5),visual_field_size=core_size+0.4)
+zeroInput = topo.pattern.Null();
+input = retinal_waves
+
+# Specify weight initialization, response function, and learning function
+CFProjection.weights_generator=topo.pattern.random.UniformRandom(seed=1023)
+CFProjection.cf_shape=topo.pattern.Disk(smoothing=0.0)
+CFProjection.response_fn=CFPRF_DotProduct_opt()
+CFProjection.learning_fn=CFPLF_Hebbian_opt()
+CFProjection.weights_output_fns=[CFPOF_DivisiveNormalizeL1_opt()]
+
+
+
+topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
+                                input_generator=input,  
+                                period=1.0, phase=0.05,
+                                nominal_bounds=BoundingBox(radius=core_size+0.25+0.375+0.25))
+
+topo.sim['LGNOn']=LISSOM(nominal_density=locals().get('lgn_density',24.0),
+                          nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
+                          output_fns=[HalfRectify(t_init=locals().get('lgn_tresh',0.0))],tsettle=0,measure_maps=True)
+
+topo.sim['LGNOff']=LISSOM(nominal_density=locals().get('lgn_density',24.0),
+                           nominal_bounds=BoundingBox(radius=core_size+0.25+0.25),
+                           output_fns=[HalfRectify(t_init=locals().get('lgn_tresh',0.0))],tsettle=0,measure_maps=True)
+
+
+centerg   = Gaussian(size=locals().get('LGNCenterSize',0.15),aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+surroundg = Gaussian(size=locals().get('LGNSurrSize',0.29540),aspect_ratio=1.0,output_fns=[DivisiveNormalizeL1()])
+on_weights = topo.pattern.Composite(
+    generators=[centerg,surroundg],operator=numpy.subtract)
+
+off_weights = topo.pattern.Composite(
+    generators=[surroundg,centerg],operator=numpy.subtract)
+
+
+topo.sim.connect('Retina','LGNOn',delay=0.05,
+                connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('RetinaStrSS',2.33),
+                nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOnAfferent3',
+                weights_generator=on_weights)
+
+topo.sim.connect('Retina','LGNOff',delay = 0.05,
+                connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('RetinaStrSS',2.33),
+                nominal_bounds_template=BoundingBox(radius=0.375),name='LGNOffAfferent4',
+                weights_generator=off_weights)
+
+AddGC()
+
+    
+from topo.analysis.featureresponses import MeasureResponseCommand, FeatureMaps, SinusoidalMeasureResponseCommand, FeatureCurveCommand
+#FeatureMaps.num_orientation=16
+#MeasureResponseCommand.scale=1.0
+#MeasureResponseCommand.duration=4.0
+#SinusoidalMeasureResponseCommand.frequencies=[2.4]
+#SinusoidalMeasureResponseCommand.num_phase=10
+#FeatureCurveCommand.num_orientation=16
+#FeatureCurveCommand.curve_parameters=[{"contrast":15},{"contrast":90}]
+
+import topo.command.pylabplot
+def a():
+    duration=0.2
+    #topo.command.pylabplot.measure_or_tuning(sheet=topo.sim["LGNOn"],num_phase=__main__.__dict__.get('NUM_PHASE',8),num_orientation=12,size=0.4,curve_parameters=[{"contrast":100}],display=True,coords=[(0.0,0.0)],frequencies=[__main__.__dict__.get('FREQ',2.4)],duration=duration)
+    topo.command.pylabplot.measure_orientation_contrast(sheet=topo.sim["LGNOn"],sizecenter=0.4,
+                                                                 orientation_center=0.0,
+                                                                 sizesurround=4.0,
+                                                                 size=0.0,
+                                                                 display=True,
+                                                                 contrastcenter=100,
+                                                                 thickness=4.0-0.4,
+                                                                 duration=0.2,
+                                                                 num_phase=__main__.__dict__.get('NUM_PHASE',8),
+                                                                 frequencies=[__main__.__dict__.get('FREQ',2.4)],
+                                                                 curve_parameters=[{"contrastsurround":100}],coords=[(0.0,0.0)])
+
