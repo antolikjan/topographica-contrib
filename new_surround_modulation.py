@@ -25,8 +25,8 @@ rc('legend',fontsize=20)
 #rc('legend',linewidth=2)
 rc('legend',labelspacing=0.25)
 
-prefix = '/media/DATA/LESI/CCLESISM_CCLESI54_A0_HC=150_LimSurr=True_duration=4.0_LHI=2.0_uniform=True_center_size=20_Max=False_num_sizes=20_LC=90/OUT/'
-prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI54_A0_HC=150_LimSurr=True_duration=4.0_LHI=2.0_uniform=True_center_size=20_Max=False_num_sizes=20_LC=90/OUT/out2.0'
+prefix = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=200_LimSurr=True_duration=16.0_LHI=2.0_uniform=True_center_size=13_Max=True_num_sizes=20_LC=100_repetitions=1_NUM_PHASE=16_NEW/OUT/'
+prefix_out = '/media/DATA/LESI/CCLESISM_CCLESI52_A0_2nd_HC=200_LimSurr=True_duration=16.0_LHI=2.0_uniform=True_center_size=13_Max=True_num_sizes=20_LC=100_repetitions=1_NUM_PHASE=16_NEW/OUT/out2.0'
 
 normalize_path.prefix = prefix_out
 
@@ -80,7 +80,7 @@ def remove_y_tick_labels():
 class SurroundModulationPlotting():
 
     low_contrast=100
-    high_contrast=150
+    high_contrast=200
     
     def __init__(self):
         import pylab
@@ -97,7 +97,7 @@ class SurroundModulationPlotting():
         self.recalculate_size_tuning_measures()
         
         print "Number of measured neurons: " , len(self.data_dict.keys())
-        if False:
+        if True:
             self.lhi = compute_local_homogeneity_index(self.OR*pi,2.0)    
             f = open(prefix_out+'/lhi2.0.pickle','wb')            
             pickle.dump(self.lhi,f)
@@ -112,10 +112,10 @@ class SurroundModulationPlotting():
         or_sup_pinwheels = 0
         or_sup_domains = 0
         for coords in self.data_dict.keys():    
-            if self.lhi[coords] < 0.3:
+            if self.lhi[coords] < 0.5:
                pinwheels.append(coords) 
                or_sup_pinwheels += self.data_dict[coords]['OCT']['Contrastsurround' + " = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]
-            if self.lhi[coords] > 0.7:
+            if self.lhi[coords] > 0.5:
                or_sup_domains += self.data_dict[coords]['OCT']['Contrastsurround' + " = " + str(self.high_contrast) + "%"]["measures"]["or_suppression"]
                centers.append(coords) 
         

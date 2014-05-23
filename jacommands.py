@@ -577,7 +577,6 @@ SimpleHomeoLinearRelative = topo.transferfn.misc.HomeostaticResponse
 def _divide_with_constant(x, y):
     y = numpy.clip(y, 0, 10000)
     x = numpy.clip(x, 0, 10000)
-    print __main__.__dict__.get('LGNGain',0.11)
     return numpy.divide(x, y + __main__.__dict__.get('LGNGain',0.11))
 
 def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
@@ -587,7 +586,6 @@ def add_gc(sheet_name, surround_gaussian_size=0.5, strength=0.63):
     be used with an LGN sheet of type LISSOM, so that it will
     respect the tsettle and strict_tsettle parameters.
     """
-    print surround_gaussian_size
     lgn_surroundg = Gaussian(size=surround_gaussian_size,
                              aspect_ratio=1.0,
                              output_fns=[DivisiveNormalizeL1()])
